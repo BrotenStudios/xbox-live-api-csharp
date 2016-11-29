@@ -1,0 +1,22 @@
+using System;
+using System.Linq;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace Microsoft.Xbox.Services.System
+{
+    public class StringService
+    {
+
+        public Task<VerifyStringResult> VerifyStringAsync(string stringToVerify)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<global::System.Collections.ObjectModel.ReadOnlyCollection<VerifyStringResult>> VerifyStringsAsync(string[] stringsToVerify)
+        {
+            throw new NotImplementedException();
+        }
+
+    }
+}
