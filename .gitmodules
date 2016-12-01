@@ -1,0 +1,3 @@
+[submodule "external/xbox-live-api"]
+	path = external/xbox-live-api
+	url = http://www.github.com/Microsoft/xbox-live-api
