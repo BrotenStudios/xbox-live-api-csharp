@@ -12,7 +12,7 @@ namespace Microsoft.Xbox.Services.RealTimeActivity
 
         public event EventHandler<RealTimeActivitySubscriptionErrorEventArgs> RealTimeActivitySubscriptionError;
 
-        public event EventHandler<RealTimeActivityConnectionState> RealTimeActivityConnectionStateChange;
+        public event EventHandler<RealTimeActivityConnectionStateChangeEventArgs> RealTimeActivityConnectionStateChange;
 
 
         public void Activate()
