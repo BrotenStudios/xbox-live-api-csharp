@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Xbox.Services.System
 {
+    using global::System.Text;
+
     public class XboxLiveUser
     {
         public XboxLiveUser(XboxLiveUser systemUser) {
@@ -60,33 +62,44 @@ namespace Microsoft.Xbox.Services.System
 
         public Task<SignInResult> SignInAsync(IntPtr coreDispatcher)
         {
-            throw new NotImplementedException();
+            this.IsSignedIn = true;
+            this.Gamertag = "Veleek";
+            return Task.FromResult(new SignInResult { Status = SignInStatus.Success });
         }
 
         public Task<SignInResult> SignInSilentlyAsync(IntPtr coreDispatcher)
         {
-            throw new NotImplementedException();
+            this.IsSignedIn = true;
+            return Task.FromResult(new SignInResult { Status = SignInStatus.Success });
         }
 
         public Task<SignInResult> SwitchAccountAsync(IntPtr coreDispatcher)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<GetTokenAndSignatureResult> GetTokenAndSignatureAsync(string httpMethod, string url, string headers, string body)
-        {
-            throw new NotImplementedException();
+            this.IsSignedIn = true;
+            return Task.FromResult(new SignInResult { Status = SignInStatus.Success });
         }
 
         public Task<GetTokenAndSignatureResult> GetTokenAndSignatureAsync(string httpMethod, string url, string headers)
         {
-            throw new NotImplementedException();
+            return this.GetTokenAndSignatureAsync(httpMethod, url, headers, (byte[])null);
         }
 
-        public Task<GetTokenAndSignatureResult> GetTokenAndSignatureArrayAsync(string httpMethod, string url, string headers, byte[] requestBodyArray)
+        public Task<GetTokenAndSignatureResult> GetTokenAndSignatureAsync(string httpMethod, string url, string headers, string body)
         {
-            throw new NotImplementedException();
+            return this.GetTokenAndSignatureAsync(httpMethod, url, headers, Encoding.UTF8.GetBytes(body));
         }
 
+        public Task<GetTokenAndSignatureResult> GetTokenAndSignatureAsync(string httpMethod, string url, string headers, byte[] body)
+        {
+            return Task.FromResult(
+                new GetTokenAndSignatureResult
+                {
+                    Gamertag = this.Gamertag,
+                    AgeGroup = this.AgeGroup,
+                    Privileges = this.Privileges,
+                    XboxUserId = this.XboxUserId,
+                    WebAccountId = this.WebAccountId
+                });
+        }
     }
 }

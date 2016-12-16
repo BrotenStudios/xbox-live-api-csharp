@@ -11,49 +11,49 @@ namespace Microsoft.Xbox.Services.System
         public string WebAccountId
         {
             get;
-            private set;
+            internal set;
         }
 
         public string Privileges
         {
             get;
-            private set;
+            internal set;
         }
 
         public string AgeGroup
         {
             get;
-            private set;
+            internal set;
         }
 
         public string XboxUserHash
         {
             get;
-            private set;
+            internal set;
         }
 
         public string Gamertag
         {
             get;
-            private set;
+            internal set;
         }
 
         public string XboxUserId
         {
             get;
-            private set;
+            internal set;
         }
 
         public string Signature
         {
             get;
-            private set;
+            internal set;
         }
 
         public string Token
         {
             get;
-            private set;
+            internal set;
         }
 
     }

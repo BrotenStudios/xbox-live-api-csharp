@@ -11,7 +11,7 @@ namespace Microsoft.Xbox.Services.System
         public SignInStatus Status
         {
             get;
-            private set;
+            internal set;
         }
 
     }
