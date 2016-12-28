@@ -1,30 +1,20 @@
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+// -----------------------------------------------------------------------
+//  <copyright file="LeaderboardColumn.cs" company="Microsoft">
+//      Copyright (c) Microsoft. All rights reserved.
+//      Licensed under the MIT license. See LICENSE file in the project root for full license information.
+//  </copyright>
+// -----------------------------------------------------------------------
 
 namespace Microsoft.Xbox.Services.Leaderboard
 {
+    using global::System;
+
     public class LeaderboardColumn
     {
+        public Type StatisticType { get; set; }
 
-        public Type StatisticType
-        {
-            get;
-            private set;
-        }
+        public string StatisticName { get; set; }
 
-        public string StatisticName
-        {
-            get;
-            private set;
-        }
-
-        public string DisplayName
-        {
-            get;
-            private set;
-        }
-
+        public string DisplayName { get; set; }
     }
 }

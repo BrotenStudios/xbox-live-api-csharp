@@ -36,7 +36,6 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    
     <!-- References to the Unity Tasks libraries -->
     <Reference Include="..\..\External\parse-sdk\$(Configuration)\Unity.Compat.dll" />
     <Reference Include="..\..\External\parse-sdk\$(Configuration)\Unity.Tasks.dll" />

@@ -11,35 +11,35 @@ namespace Microsoft.Xbox.Services.Leaderboard
         public bool HasNext
         {
             get;
-            private set;
+            set;
         }
 
         public IList<LeaderboardRow> Rows
         {
             get;
-            private set;
+            set;
         }
 
         public IList<LeaderboardColumn> Columns
         {
             get;
-            private set;
+            set;
         }
 
         public uint TotalRowCount
         {
             get;
-            private set;
+            set;
         }
 
         public string DisplayName
         {
             get;
-            private set;
+            set;
         }
 
 
-        public Task<LeaderboardResult> GetNextAsync(uint maxItems)
+        public virtual Task<LeaderboardResult> GetNextAsync(uint maxItems)
         {
             throw new NotImplementedException();
         }

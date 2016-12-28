@@ -1,128 +1,72 @@
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+// -----------------------------------------------------------------------
+//  <copyright file="XboxLiveContext.cs" company="Microsoft">
+//      Copyright (c) Microsoft. All rights reserved.
+//      Licensed under the MIT license. See LICENSE file in the project root for full license information.
+//  </copyright>
+// -----------------------------------------------------------------------
 
 namespace Microsoft.Xbox.Services
 {
+    using Microsoft.Xbox.Services.Achievements;
+    using Microsoft.Xbox.Services.ContextualSearch;
+    using Microsoft.Xbox.Services.Events;
+    using Microsoft.Xbox.Services.GameServerPlatform;
+    using Microsoft.Xbox.Services.Leaderboard;
+    using Microsoft.Xbox.Services.Matchmaking;
+    using Microsoft.Xbox.Services.Multiplayer;
+    using Microsoft.Xbox.Services.Presence;
+    using Microsoft.Xbox.Services.Privacy;
+    using Microsoft.Xbox.Services.RealTimeActivity;
+    using Microsoft.Xbox.Services.Social;
+    using Microsoft.Xbox.Services.System;
+    using Microsoft.Xbox.Services.TitleStorage;
+    using Microsoft.Xbox.Services.UserStatistics;
+
     public class XboxLiveContext
     {
-        public XboxLiveContext(Microsoft.Xbox.Services.System.XboxLiveUser user) {
-        }
-
-        public XboxLiveAppConfiguration AppConfig
+        public XboxLiveContext(XboxLiveUser user)
         {
-            get;
-            private set;
+            this.User = user;
         }
 
-        public XboxLiveContextSettings Settings
-        {
-            get;
-            private set;
-        }
+        public static bool UseMockData { get; set; }
 
-        public Microsoft.Xbox.Services.Events.EventsService EventsService
-        {
-            get;
-            private set;
-        }
+        public XboxLiveAppConfiguration AppConfig { get; } = new XboxLiveAppConfiguration();
 
-        public Microsoft.Xbox.Services.ContextualSearch.ContextualSearchService ContextualSearchService
-        {
-            get;
-            private set;
-        }
+        public XboxLiveContextSettings Settings { get; } = new XboxLiveContextSettings();
 
-        public Microsoft.Xbox.Services.System.StringService StringService
-        {
-            get;
-            private set;
-        }
+        public EventsService EventsService { get; } = new EventsService();
 
-        public Microsoft.Xbox.Services.Privacy.PrivacyService PrivacyService
-        {
-            get;
-            private set;
-        }
+        public ContextualSearchService ContextualSearchService { get; } = new ContextualSearchService();
 
-        public Microsoft.Xbox.Services.TitleStorage.TitleStorageService TitleStorageService
-        {
-            get;
-            private set;
-        }
+        public StringService StringService { get; } = new StringService();
 
-        public Microsoft.Xbox.Services.GameServerPlatform.GameServerPlatformService GameServerPlatformService
-        {
-            get;
-            private set;
-        }
+        public PrivacyService PrivacyService { get; } = new PrivacyService();
 
-        public Microsoft.Xbox.Services.Presence.PresenceService PresenceService
-        {
-            get;
-            private set;
-        }
+        public TitleStorageService TitleStorageService = new TitleStorageService();
 
-        public Microsoft.Xbox.Services.RealTimeActivity.RealTimeActivityService RealTimeActivityService
-        {
-            get;
-            private set;
-        }
+        public GameServerPlatformService GameServerPlatformService { get; } = new GameServerPlatformService();
 
-        public Microsoft.Xbox.Services.Multiplayer.MultiplayerService MultiplayerService
-        {
-            get;
-            private set;
-        }
+        public PresenceService PresenceService { get; } = new PresenceService();
 
-        public Microsoft.Xbox.Services.Matchmaking.MatchmakingService MatchmakingService
-        {
-            get;
-            private set;
-        }
+        public RealTimeActivityService RealTimeActivityService { get; } = new RealTimeActivityService();
 
-        public Microsoft.Xbox.Services.UserStatistics.UserStatisticsService UserStatisticsService
-        {
-            get;
-            private set;
-        }
+        public MultiplayerService MultiplayerService { get; } = new MultiplayerService();
 
-        public Microsoft.Xbox.Services.Leaderboard.LeaderboardService LeaderboardService
-        {
-            get;
-            private set;
-        }
+        public MatchmakingService MatchmakingService { get; } = new MatchmakingService();
 
-        public Microsoft.Xbox.Services.Achievements.AchievementService AchievementService
-        {
-            get;
-            private set;
-        }
+        public UserStatisticsService UserStatisticsService { get; } = new UserStatisticsService();
 
-        public Microsoft.Xbox.Services.Social.ReputationService ReputationService
-        {
-            get;
-            private set;
-        }
+        public LeaderboardService LeaderboardService { get; } = new LeaderboardService();
 
-        public Microsoft.Xbox.Services.Social.SocialService SocialService
-        {
-            get;
-            private set;
-        }
+        public AchievementService AchievementService { get; } = new AchievementService();
 
-        public Microsoft.Xbox.Services.Social.ProfileService ProfileService
-        {
-            get;
-            private set;
-        }
+        public ReputationService ReputationService { get; } = new ReputationService();
 
-        public Microsoft.Xbox.Services.System.XboxLiveUser User
-        {
-            get;
-            private set;
-        }
+        public SocialService SocialService { get; } = new SocialService();
 
+        public ProfileService ProfileService { get; } = new ProfileService();
+
+        public XboxLiveUser User { get; }
     }
 }

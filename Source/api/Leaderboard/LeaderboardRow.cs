@@ -7,35 +7,34 @@ namespace Microsoft.Xbox.Services.Leaderboard
 {
     public class LeaderboardRow
     {
-
         public IList<string> Values
         {
             get;
-            private set;
+            set;
         }
 
         public uint Rank
         {
             get;
-            private set;
+            set;
         }
 
         public double Percentile
         {
             get;
-            private set;
+            set;
         }
 
         public string XboxUserId
         {
             get;
-            private set;
+            set;
         }
 
         public string Gamertag
         {
             get;
-            private set;
+            set;
         }
 
     }
