@@ -27,46 +27,66 @@ namespace Microsoft.Xbox.Services
         public XboxLiveContext(XboxLiveUser user)
         {
             this.User = user;
+
+            this.AppConfig = new XboxLiveAppConfiguration();
+            this.Settings = new XboxLiveContextSettings();
+
+            this.AchievementService = new AchievementService();
+            this.ContextualSearchService = new ContextualSearchService();
+            this.EventsService = new EventsService();
+            this.GameServerPlatformService = new GameServerPlatformService();
+            this.LeaderboardService = new LeaderboardService();
+            this.MatchmakingService = new MatchmakingService();
+            this.MultiplayerService = new MultiplayerService();
+            this.PresenceService = new PresenceService();
+            this.PrivacyService = new PrivacyService();
+            this.ProfileService = new ProfileService();
+            this.RealTimeActivityService = new RealTimeActivityService();
+            this.ReputationService = new ReputationService();
+            this.SocialService = new SocialService();
+            this.StringService = new StringService();
+            this.TitleStorageService = new TitleStorageService();
+            this.UserStatisticsService = new UserStatisticsService();
         }
 
         public static bool UseMockData { get; set; }
 
-        public XboxLiveAppConfiguration AppConfig { get; } = new XboxLiveAppConfiguration();
+        public XboxLiveAppConfiguration AppConfig { get; private set; }
 
-        public XboxLiveContextSettings Settings { get; } = new XboxLiveContextSettings();
+        public XboxLiveContextSettings Settings { get; private set; }
 
-        public EventsService EventsService { get; } = new EventsService();
+        public EventsService EventsService { get; private set; }
 
-        public ContextualSearchService ContextualSearchService { get; } = new ContextualSearchService();
+        public ContextualSearchService ContextualSearchService { get; private set; }
 
-        public StringService StringService { get; } = new StringService();
+        public StringService StringService { get; private set; }
 
-        public PrivacyService PrivacyService { get; } = new PrivacyService();
+        public PrivacyService PrivacyService { get; private set; }
 
-        public TitleStorageService TitleStorageService = new TitleStorageService();
+        public TitleStorageService TitleStorageService { get; private set; }
 
-        public GameServerPlatformService GameServerPlatformService { get; } = new GameServerPlatformService();
+        public GameServerPlatformService GameServerPlatformService { get; private set; }
 
-        public PresenceService PresenceService { get; } = new PresenceService();
+        public PresenceService PresenceService { get; private set; }
 
-        public RealTimeActivityService RealTimeActivityService { get; } = new RealTimeActivityService();
+        public RealTimeActivityService RealTimeActivityService { get; private set; }
 
-        public MultiplayerService MultiplayerService { get; } = new MultiplayerService();
+        public MultiplayerService MultiplayerService { get; private set; }
 
-        public MatchmakingService MatchmakingService { get; } = new MatchmakingService();
+        public MatchmakingService MatchmakingService { get; private set; }
 
-        public UserStatisticsService UserStatisticsService { get; } = new UserStatisticsService();
+        public UserStatisticsService UserStatisticsService { get; private set; }
 
-        public LeaderboardService LeaderboardService { get; } = new LeaderboardService();
+        public LeaderboardService LeaderboardService { get; private set; }
 
-        public AchievementService AchievementService { get; } = new AchievementService();
+        public AchievementService AchievementService { get; private set; }
 
-        public ReputationService ReputationService { get; } = new ReputationService();
+        public ReputationService ReputationService { get; private set; }
 
-        public SocialService SocialService { get; } = new SocialService();
+        public SocialService SocialService { get; private set; }
 
-        public ProfileService ProfileService { get; } = new ProfileService();
+        public ProfileService ProfileService { get; private set; }
 
-        public XboxLiveUser User { get; }
+        public XboxLiveUser User { get; private set; }
     }
 }

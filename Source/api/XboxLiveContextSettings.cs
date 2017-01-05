@@ -11,6 +11,11 @@ namespace Microsoft.Xbox.Services
 
     public class XboxLiveContextSettings
     {
+        public XboxLiveContextSettings()
+        {
+            this.DiagnosticsTraceLevel = XboxServicesDiagnosticsTraceLevel.Off;
+        }
+
         public bool UseCoreDispatcherForEventRouting { get; set; }
 
         public TimeSpan WebsocketTimeoutWindow { get; set; }
@@ -23,7 +28,7 @@ namespace Microsoft.Xbox.Services
 
         public TimeSpan HttpTimeout { get; set; }
 
-        public XboxServicesDiagnosticsTraceLevel DiagnosticsTraceLevel { get; set; } = XboxServicesDiagnosticsTraceLevel.Off;
+        public XboxServicesDiagnosticsTraceLevel DiagnosticsTraceLevel { get; private set; }
 
         public bool EnableServiceCallRoutedEvents { get; set; }
 

@@ -61,7 +61,7 @@ namespace Microsoft.Xbox.Services
         {
             int id = rng.Next();
             Type statType;
-            switch (0)
+            switch (id)
             {
                 case 0:
                     statType = typeof(int);

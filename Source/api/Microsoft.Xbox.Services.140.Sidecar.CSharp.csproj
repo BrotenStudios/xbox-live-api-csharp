@@ -48,6 +48,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MockData.cs" />
     <Compile Include="RealTimeActivity\RealTimeActivityConnectionStateChangeEventArgs.cs" />
     <Compile Include="System\SignInStatus.cs" />
     <Compile Include="System\VerifyStringResultCode.cs" />
