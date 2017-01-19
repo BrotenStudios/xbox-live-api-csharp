@@ -8,7 +8,7 @@ namespace Microsoft.Xbox.Services.Social.Manager
     public class SocialEvent
     {
 
-        public Microsoft.Xbox.Services.Social.Manager.ocialEventArgs EventArgs
+        public Microsoft.Xbox.Services.Social.Manager.SocialEventArgs EventArgs
         {
             get;
             private set;

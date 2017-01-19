@@ -7,19 +7,6 @@ namespace Microsoft.Xbox.Services.Multiplayer.Manager
 {
     public class MultiplayerGameSession
     {
-
-        public Dictionary<string, Microsoft.Xbox.Services.Tournaments.TournamentTeamResult> TournamentTeamResults
-        {
-            get;
-            private set;
-        }
-
-        public Dictionary<string, Microsoft.Xbox.Services.Multiplayer.MultiplayerSessionReference> TournamentTeams
-        {
-            get;
-            private set;
-        }
-
         public Microsoft.Xbox.Services.Multiplayer.MultiplayerSessionConstants SessionConstants
         {
             get;

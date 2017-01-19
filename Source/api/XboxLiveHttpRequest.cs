@@ -79,8 +79,9 @@ namespace Microsoft.Xbox.Services
             ServerName = serverName;
             PathQueryFragment = pathQueryFragment;
             m_ContextSettings = settings;
-            
+#if !WINDOWS_UWP
             m_NetRequest = new HttpWebRequest(new Uri(Url));
+#endif
         }
 
         public Task<XboxLiveHttpResponse> GetResponseWithAuth(Microsoft.Xbox.Services.System.XboxLiveUser user, HttpCallResponseBodyType httpCallResponseBodyType)
@@ -90,7 +91,9 @@ namespace Microsoft.Xbox.Services
                 {
                     string token = "";
                     token = tokenTask.Result.Token;
+#if !WINDOWS_UWP
                     m_NetRequest.Headers.Add(AuthorizationHeaderName, token);
+#endif
                     return GetResponseWithoutAuth(httpCallResponseBodyType).Result;
                 });
         }

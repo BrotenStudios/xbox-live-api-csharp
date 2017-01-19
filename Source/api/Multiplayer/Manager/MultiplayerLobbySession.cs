@@ -7,13 +7,6 @@ namespace Microsoft.Xbox.Services.Multiplayer.Manager
 {
     public class MultiplayerLobbySession
     {
-
-        public Microsoft.Xbox.Services.Tournaments.TournamentTeamResult LastTournamentTeamResult
-        {
-            get;
-            private set;
-        }
-
         public Microsoft.Xbox.Services.Multiplayer.MultiplayerSessionConstants SessionConstants
         {
             get;

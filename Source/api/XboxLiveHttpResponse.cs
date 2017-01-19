@@ -89,8 +89,8 @@ namespace Microsoft.Xbox.Services
                 body.Read(ResponseBodyVector, 0, ResponseBodyVector.Length);
             }
 
-            Encoding enc;
-
+            Encoding enc = Encoding.UTF8;
+#if !WINDOWS_UWP
             switch(response.CharacterSet.ToLower())
             {
                 case "utf-8":
@@ -103,7 +103,7 @@ namespace Microsoft.Xbox.Services
                     enc = Encoding.UTF8;
                     break;
             }
-
+#endif
             using (MemoryStream ms = new MemoryStream(ResponseBodyVector))
             {
                 using (StreamReader sr = new StreamReader(ms, enc))
@@ -115,7 +115,7 @@ namespace Microsoft.Xbox.Services
 
             for (int i = 0; i < response.Headers.Count; ++i)
             {
-                Headers.Add(response.Headers.Keys[i], response.Headers[i]);
+                Headers.Add(response.Headers.AllKeys[i], response.Headers[response.Headers.AllKeys[i]]);
             }
         }
     }

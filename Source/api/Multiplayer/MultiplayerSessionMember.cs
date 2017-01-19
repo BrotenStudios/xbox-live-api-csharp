@@ -7,19 +7,6 @@ namespace Microsoft.Xbox.Services.Multiplayer
 {
     public class MultiplayerSessionMember
     {
-
-        public Microsoft.Xbox.Services.Tournaments.TournamentArbitrationStatus ArbitrationStatus
-        {
-            get;
-            private set;
-        }
-
-        public Dictionary<string, Microsoft.Xbox.Services.Tournaments.TournamentTeamResult> Results
-        {
-            get;
-            private set;
-        }
-
         public IList<string> Encounters
         {
             get;

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Xbox.Services.Social.Manager
 {
-    public class ocialEventArgs : EventArgs
+    public class SocialEventArgs : EventArgs
     {
     }
 }

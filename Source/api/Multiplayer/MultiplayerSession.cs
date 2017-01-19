@@ -56,18 +56,6 @@ namespace Microsoft.Xbox.Services.Multiplayer
             private set;
         }
 
-        public MultiplayerSessionArbitrationServer ArbitrationServer
-        {
-            get;
-            private set;
-        }
-
-        public MultiplayerSessionTournamentsServer TournamentsServer
-        {
-            get;
-            private set;
-        }
-
         public MultiplayerSessionMatchmakingServer MatchmakingServer
         {
             get;
@@ -222,11 +210,6 @@ namespace Microsoft.Xbox.Services.Multiplayer
         }
 
         public void SetCurrentUserQualityOfServiceServerMeasurementsJson(string valueJson)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SetCurrentUserArbitrationResults(Dictionary<string, Microsoft.Xbox.Services.Tournaments.TournamentTeamResult> results)
         {
             throw new NotImplementedException();
         }
