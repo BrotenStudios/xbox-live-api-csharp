@@ -13,7 +13,12 @@ extern "C"
 #pragma pack(push, 8)
 	struct SignInResult
 	{
-		int32_t status;
+        int32_t status;
+        wchar_t * xboxUserId;
+        wchar_t * gamertag;
+        wchar_t * ageGroup;
+        wchar_t * privileges;
+        wchar_t * webAccountId;
 	};
 
 	struct TokenAndSignatureResult 
@@ -30,9 +35,9 @@ extern "C"
 	};
 #pragma pack(pop)
 
-	typedef void(__stdcall *SignInCompletedCallback)(int32_t xblErrorCode, SignInResult result);
-	SIDECAR_AUTH_API void SignIn(void *coreDispatcher, bool showUI, SignInCompletedCallback onCompleted);
+	typedef void(__stdcall *SignInCompletedCallback)(int32_t context, int32_t xblErrorCode, SignInResult result);
+	SIDECAR_AUTH_API void SignIn(bool showUI, int32_t context, SignInCompletedCallback onCompleted);
 
-	typedef void(__stdcall *GetTokenAndSignatureCallback)(int32_t xblErrorCode, TokenAndSignatureResult result);
-	SIDECAR_AUTH_API void GetTokenAndSignature(wchar_t* httpMethod, wchar_t* url, wchar_t* headers, wchar_t* body, GetTokenAndSignatureCallback callback);
+	typedef void(__stdcall *GetTokenAndSignatureCallback)(int32_t context, int32_t xblErrorCode, TokenAndSignatureResult result);
+	SIDECAR_AUTH_API void GetTokenAndSignature(wchar_t* httpMethod, wchar_t* url, wchar_t* headers, wchar_t* body, int32_t context, GetTokenAndSignatureCallback callback);
 }

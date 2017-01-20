@@ -75,6 +75,7 @@ namespace Microsoft.Xbox.Services
         private XboxLiveContextSettings m_ContextSettings;
         private HttpWebRequest m_NetRequest;
         private Dictionary<string, string> m_CustomHeaders = new Dictionary<string, string>();
+        private string m_RequestBody = string.Empty;
 
         private XboxLiveHttpRequest(XboxLiveContextSettings settings, string httpMethod, string serverName, string pathQueryFragment)
         {
@@ -82,27 +83,51 @@ namespace Microsoft.Xbox.Services
             ServerName = serverName;
             PathQueryFragment = pathQueryFragment;
             m_ContextSettings = settings;
-#if !WINDOWS_UWP
-            m_NetRequest = new HttpWebRequest(new Uri(Url));
-#endif
+
+            m_NetRequest = (HttpWebRequest)WebRequest.Create(Url);
+            m_NetRequest.Method = HttpMethod;
+            //m_NetRequest = new HttpWebRequest(new Uri(Url));            
         }
 
         public Task<XboxLiveHttpResponse> GetResponseWithAuth(System.XboxLiveUser user, HttpCallResponseBodyType httpCallResponseBodyType)
         {
-            return user.GetTokenAndSignatureAsync(HttpMethod, Url, Headers).ContinueWith(
+            return user.GetTokenAndSignatureAsync(HttpMethod, Url, Headers, m_RequestBody).ContinueWith(
                 (tokenTask) =>
                 {
                     string token = "";
                     token = tokenTask.Result.Token;
-#if !WINDOWS_UWP
                     m_NetRequest.Headers.Add(AuthorizationHeaderName, token);
-#endif
+                    m_NetRequest.Headers.Add(SignatureHeaderName, tokenTask.Result.Signature);
                     return GetResponseWithoutAuth(httpCallResponseBodyType).Result;
                 });
         }
 
         public Task<XboxLiveHttpResponse> GetResponseWithoutAuth(HttpCallResponseBodyType httpCallResponseBodyType)
         {
+            m_NetRequest.ContentType = "application/json; charset=utf-8";
+
+            if (m_RequestBody != string.Empty)
+            {
+                m_NetRequest.ContentLength = m_RequestBody.Length;
+
+                // we have to use the async BeginGetRequestStream so that we can later use the async BeginGetResponse.  The sync
+                // and async APIs can't be mixed
+                var task = Task.Factory.FromAsync(m_NetRequest.BeginGetRequestStream, m_NetRequest.EndGetRequestStream, null)
+                    .ContinueWith((t) =>
+                    {
+                        using (Stream body = t.Result)
+                        {
+                            using (StreamWriter sw = new StreamWriter(body))
+                            {
+                                sw.Write(m_RequestBody);
+                                sw.Flush();
+                                sw.Close();
+                            }
+                        }
+                    });
+                task.Wait();
+            }
+
             return Task.Factory.FromAsync(m_NetRequest.BeginGetResponse, m_NetRequest.EndGetResponse, null)
                 .ContinueWith((wrTask) =>
                 {
@@ -112,16 +137,12 @@ namespace Microsoft.Xbox.Services
 
         public void SetRequestBody(string value)
         {
-            // we have to use the async BeginGetRequestStream so that we can later use the async BeginGetResponse.  The sync
-            // and async APIs can't be mixed
-            var task = Task.Factory.FromAsync(m_NetRequest.BeginGetRequestStream, m_NetRequest.EndGetRequestStream, null)
-                .ContinueWith((t) =>
-                {
-                    Stream body = t.Result;
-                    StreamWriter sw = new StreamWriter(body);
-                    sw.Write(value);
-                });
-            task.Wait();
+            if (value == null)
+            {
+                return;
+            }
+
+            m_RequestBody = value;
         }
 
         public void SetRequestBody(byte[] value)

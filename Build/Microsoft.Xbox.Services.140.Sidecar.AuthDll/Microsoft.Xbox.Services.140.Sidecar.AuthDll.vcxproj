@@ -177,6 +177,11 @@
       <AdditionalOptions>/APPCONTAINER:NO %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>UWP_API=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\External\xbox-live-api\Build\Microsoft.Xbox.Services.140.Sidecar\Microsoft.Xbox.Services.140.Sidecar.Cpp.vcxproj">
       <Project>{8F96710E-5169-4917-8874-7DE248F4D243}</Project>

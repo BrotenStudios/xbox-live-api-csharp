@@ -20,9 +20,9 @@ namespace Microsoft.Xbox.Services.Social.Models
             InitializeSettings(useDefaultSettings);
         }
 
-        public IEnumerable<string> userIds { get; set; }
-
         public List<string> settings { get; set; }
+
+        public IEnumerable<string> userIds { get; set; }
 
         private void InitializeSettings(bool useDefaultSettings)
         {
