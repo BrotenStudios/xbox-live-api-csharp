@@ -36,6 +36,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\external\newtonsoft\9.0.1\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
@@ -531,6 +535,12 @@
     <Compile Include="..\..\Source\api\Social\Manager\XboxSocialUserGroup.cs">
       <Link>Social\Manager\XboxSocialUserGroup.cs</Link>
     </Compile>
+    <Compile Include="..\..\Source\api\Social\Models\ProfileSettingsRequest.cs">
+      <Link>Social\Models\ProfileSettingsRequest.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Source\api\Social\Models\ProfileSettingsResponse.cs">
+      <Link>Social\Models\ProfileSettingsResponse.cs</Link>
+    </Compile>
     <Compile Include="..\..\Source\api\Social\ProfileService.cs">
       <Link>Social\ProfileService.cs</Link>
     </Compile>
@@ -575,6 +585,9 @@
     </Compile>
     <Compile Include="..\..\Source\api\System\GetTokenAndSignatureResult.cs">
       <Link>System\GetTokenAndSignatureResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Source\api\System\JsonSerialization.cs">
+      <Link>System\JsonSerialization.cs</Link>
     </Compile>
     <Compile Include="..\..\Source\api\System\SignInResult.cs">
       <Link>System\SignInResult.cs</Link>
@@ -662,6 +675,9 @@
     </Compile>
     <Compile Include="..\..\Source\api\XboxLiveContextThrottleSetting.cs">
       <Link>XboxLiveContextThrottleSetting.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Source\api\XboxLiveEndpoint.cs">
+      <Link>XboxLiveEndpoint.cs</Link>
     </Compile>
     <Compile Include="..\..\Source\api\XboxLiveHttpRequest.cs">
       <Link>XboxLiveHttpRequest.cs</Link>

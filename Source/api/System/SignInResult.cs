@@ -7,6 +7,10 @@ namespace Microsoft.Xbox.Services.System
 {
     public class SignInResult
     {
+        public SignInResult(SignInStatus status)
+        {
+            Status = status;
+        }
 
         public SignInStatus Status
         {

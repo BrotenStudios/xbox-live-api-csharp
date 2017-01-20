@@ -56,5 +56,10 @@ namespace Microsoft.Xbox.Services.System
             internal set;
         }
 
+        internal string Reserved
+        {
+            get;
+            set;
+        }
     }
 }

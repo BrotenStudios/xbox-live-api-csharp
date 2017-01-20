@@ -40,7 +40,7 @@ namespace Microsoft.Xbox.Services
             this.MultiplayerService = new MultiplayerService();
             this.PresenceService = new PresenceService();
             this.PrivacyService = new PrivacyService();
-            this.ProfileService = new ProfileService();
+            this.ProfileService = new ProfileService(AppConfig, this, Settings);
             this.RealTimeActivityService = new RealTimeActivityService();
             this.ReputationService = new ReputationService();
             this.SocialService = new SocialService();

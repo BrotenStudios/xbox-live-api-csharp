@@ -9,7 +9,6 @@ namespace Microsoft.Xbox.Services
 {
     public class XboxLiveHttpRequest
     {
-
         public string HttpMethod
         {
             get;
@@ -68,7 +67,11 @@ namespace Microsoft.Xbox.Services
             }
         }
 
-        private const string AuthorizationHeaderName = "X-Authorize";
+        private const string AuthorizationHeaderName = "Authorization";
+        private const string SignatureHeaderName = "Signature";
+        private const string ETagHeaderName = "ETag";
+        private const string DateHeaderName = "Date";
+
         private XboxLiveContextSettings m_ContextSettings;
         private HttpWebRequest m_NetRequest;
         private Dictionary<string, string> m_CustomHeaders = new Dictionary<string, string>();
@@ -84,7 +87,7 @@ namespace Microsoft.Xbox.Services
 #endif
         }
 
-        public Task<XboxLiveHttpResponse> GetResponseWithAuth(Microsoft.Xbox.Services.System.XboxLiveUser user, HttpCallResponseBodyType httpCallResponseBodyType)
+        public Task<XboxLiveHttpResponse> GetResponseWithAuth(System.XboxLiveUser user, HttpCallResponseBodyType httpCallResponseBodyType)
         {
             return user.GetTokenAndSignatureAsync(HttpMethod, Url, Headers).ContinueWith(
                 (tokenTask) =>

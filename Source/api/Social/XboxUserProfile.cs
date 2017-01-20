@@ -5,50 +5,49 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Xbox.Services.Social
 {
+    [Serializable]
     public class XboxUserProfile
     {
-
         public string XboxUserId
         {
             get;
-            private set;
+            internal set;
         }
 
         public string Gamertag
         {
             get;
-            private set;
+            internal set;
         }
 
         public string Gamerscore
         {
             get;
-            private set;
+            internal set;
         }
 
         public Uri GameDisplayPictureResizeUri
         {
             get;
-            private set;
+            internal set;
         }
 
         public string GameDisplayName
         {
             get;
-            private set;
+            internal set;
         }
 
         public Uri ApplicationDisplayPictureResizeUri
         {
             get;
-            private set;
+            internal set;
         }
 
         public string ApplicationDisplayName
         {
             get;
-            private set;
+            internal set;
         }
-
     }
 }
