@@ -285,6 +285,15 @@
           "ref/netstandard1.3/Microsoft.Win32.Primitives.dll": {}
         }
       },
+      "Newtonsoft.Json/9.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.dll": {}
+        },
+        "runtime": {
+          "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.dll": {}
+        }
+      },
       "runtime.native.System.IO.Compression/4.1.0": {
         "type": "package",
         "dependencies": {
@@ -2371,6 +2380,15 @@
         },
         "compile": {
           "ref/netstandard1.3/Microsoft.Win32.Primitives.dll": {}
+        }
+      },
+      "Newtonsoft.Json/9.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.dll": {}
+        },
+        "runtime": {
+          "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.dll": {}
         }
       },
       "runtime.any.System.Collections/4.0.11": {
@@ -4620,6 +4638,15 @@
         },
         "compile": {
           "ref/netstandard1.3/Microsoft.Win32.Primitives.dll": {}
+        }
+      },
+      "Newtonsoft.Json/9.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.dll": {}
+        },
+        "runtime": {
+          "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.dll": {}
         }
       },
       "runtime.aot.System.Collections/4.0.10": {
@@ -6911,6 +6938,15 @@
           "ref/netstandard1.3/Microsoft.Win32.Primitives.dll": {}
         }
       },
+      "Newtonsoft.Json/9.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.dll": {}
+        },
+        "runtime": {
+          "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.dll": {}
+        }
+      },
       "runtime.any.System.Collections/4.0.11": {
         "type": "package",
         "dependencies": {
@@ -9167,6 +9203,15 @@
         },
         "compile": {
           "ref/netstandard1.3/Microsoft.Win32.Primitives.dll": {}
+        }
+      },
+      "Newtonsoft.Json/9.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.dll": {}
+        },
+        "runtime": {
+          "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.dll": {}
         }
       },
       "runtime.aot.System.Collections/4.0.10": {
@@ -11464,6 +11509,15 @@
           "ref/netstandard1.3/Microsoft.Win32.Primitives.dll": {}
         }
       },
+      "Newtonsoft.Json/9.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.dll": {}
+        },
+        "runtime": {
+          "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.dll": {}
+        }
+      },
       "runtime.any.System.Collections/4.0.11": {
         "type": "package",
         "dependencies": {
@@ -13722,6 +13776,15 @@
           "ref/netstandard1.3/Microsoft.Win32.Primitives.dll": {}
         }
       },
+      "Newtonsoft.Json/9.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.dll": {}
+        },
+        "runtime": {
+          "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.dll": {}
+        }
+      },
       "runtime.aot.System.Collections/4.0.10": {
         "type": "package",
         "dependencies": {
@@ -15863,7 +15926,7 @@
       ]
     },
     "Microsoft.NETCore.Platforms/1.0.1": {
-      "sha512": "2G6OjjJzwBfNOO8myRV/nFrbTw5iA+DEm0N+qUqhrOmaVtn4pC77h38I1jsXGw5VH55+dPfQsqHD0We9sCl9FQ==",
+      "sha512": "n6fsSSFE4IR7i7Ne+pE4nd7LeaeK2WjZaYwmoS5FtY0kO9xF0g8+zIM8i7Gj5DJqszbPGZwrRaX7r0lOPnwBIQ==",
       "type": "package",
       "files": [
         "Microsoft.NETCore.Platforms.1.0.1.nupkg.sha512",
@@ -15989,7 +16052,7 @@
       ]
     },
     "Microsoft.NETCore.Windows.ApiSets/1.0.1": {
-      "sha512": "SaToCvvsGMxTgtLv/BrFQ5IFMPRE1zpWbnqbpwykJa8W5XiX82CXI6K2o7yf5xS7EP6t/JzFLV0SIDuWpvBZVw==",
+      "sha512": "ke40a4onFV9Ok5iyytCThg7yk/2hus3ecqA0EvbS08Ut9CUwdSNWV527ZGEhhbn7YS86JZ3gS4IAoS/FbxzzwQ==",
       "type": "package",
       "files": [
         "Microsoft.NETCore.Windows.ApiSets.1.0.1.nupkg.sha512",
@@ -16074,6 +16137,29 @@
         "ref/xamarinmac20/_._",
         "ref/xamarintvos10/_._",
         "ref/xamarinwatchos10/_._"
+      ]
+    },
+    "Newtonsoft.Json/9.0.1": {
+      "sha512": "U82mHQSKaIk+lpSVCbWYKNavmNH1i5xrExDEquU1i6I5pV6UMOqRnJRSlKO3cMPfcpp0RgDY+8jUXHdQ4IfXvw==",
+      "type": "package",
+      "files": [
+        "Newtonsoft.Json.9.0.1.nupkg.sha512",
+        "Newtonsoft.Json.nuspec",
+        "lib/net20/Newtonsoft.Json.dll",
+        "lib/net20/Newtonsoft.Json.xml",
+        "lib/net35/Newtonsoft.Json.dll",
+        "lib/net35/Newtonsoft.Json.xml",
+        "lib/net40/Newtonsoft.Json.dll",
+        "lib/net40/Newtonsoft.Json.xml",
+        "lib/net45/Newtonsoft.Json.dll",
+        "lib/net45/Newtonsoft.Json.xml",
+        "lib/netstandard1.0/Newtonsoft.Json.dll",
+        "lib/netstandard1.0/Newtonsoft.Json.xml",
+        "lib/portable-net40+sl5+wp80+win8+wpa81/Newtonsoft.Json.dll",
+        "lib/portable-net40+sl5+wp80+win8+wpa81/Newtonsoft.Json.xml",
+        "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.dll",
+        "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.xml",
+        "tools/install.ps1"
       ]
     },
     "runtime.any.System.Collections/4.0.11": {
@@ -16985,7 +17071,7 @@
       ]
     },
     "System.AppContext/4.1.0": {
-      "sha512": "3QjO4jNV7PdKkmQAVp9atA+usVnKRwI3Kx1nMwJ93T0LcQfx7pKAYk0nKz5wn1oP5iqlhZuy6RXOFdhr7rDwow==",
+      "sha512": "z7AFf8EiCg33CruxV0Vv+ESQ5jOj29tTmV/XTmbjJwQsC5y5BtkAukjkGkFV4exWyxb+L06CMaUdy/jpC8ENng==",
       "type": "package",
       "files": [
         "System.AppContext.4.1.0.nupkg.sha512",
@@ -17689,7 +17775,7 @@
       ]
     },
     "System.Diagnostics.Tools/4.0.1": {
-      "sha512": "xBfJ8pnd4C17dWaC9FM6aShzbJcRNMChUMD42I6772KGGrqaFdumwhn9OdM68erj1ueNo3xdQ1EwiFjK5k8p0g==",
+      "sha512": "QQ6RmpKdLRveSkPoYj0Xf1bGBLUYaw+ixWHpYzHs4UkYEESRio/MAx7qpTqjSc3pgETKrAc6wey/+oYaKGrp0A==",
       "type": "package",
       "files": [
         "System.Diagnostics.Tools.4.0.1.nupkg.sha512",
@@ -17743,7 +17829,7 @@
       ]
     },
     "System.Diagnostics.Tracing/4.1.0": {
-      "sha512": "vDN1PoMZCkkdNjvZLql592oYJZgS7URcJzJ7bxeBgGtx5UtR5leNm49VmfHGqIffX4FKacHbI3H6UyNSHQknBg==",
+      "sha512": "bu/GuNnW5LKicUxaxOhkMj3Q+GYKK/jqeKLTW3nxAFc/6e+vVqyA6zuD4Hc5fIcA7rIQD1j3/Q3Xmr6hOdbrBA==",
       "type": "package",
       "files": [
         "System.Diagnostics.Tracing.4.1.0.nupkg.sha512",
@@ -18218,7 +18304,7 @@
       ]
     },
     "System.IO.FileSystem/4.0.1": {
-      "sha512": "IBErlVq5jOggAD69bg1t0pJcHaDbJbWNUZTPI96fkYWzwYbN6D9wRHMULLDd9dHsl7C2YsxXL31LMfPI1SWt8w==",
+      "sha512": "Kev9C3uvcZ7apAL5uW1SF1dtBVCECc6KgfprwdMQh80XuPLyspRyrV/4jTHcm/kECepDpST95xxSZuPC9oCtIw==",
       "type": "package",
       "files": [
         "System.IO.FileSystem.4.0.1.nupkg.sha512",
@@ -18253,7 +18339,7 @@
       ]
     },
     "System.IO.FileSystem.Primitives/4.0.1": {
-      "sha512": "kWkKD203JJKxJeE74p8aF8y4Qc9r9WQx4C0cHzHPrY3fv/L/IhWnyCHaFJ3H1QPOH6A93whlQ2vG5nHlBDvzWQ==",
+      "sha512": "D5geWxR5rstJJor/1qd+yepU+DMcJT45HxI//x0C/poDD8WovFtVhT4QGkN6bpU3SG7GmqKAKMmsG+QxU4Pshg==",
       "type": "package",
       "files": [
         "System.IO.FileSystem.Primitives.4.0.1.nupkg.sha512",
@@ -19604,7 +19690,7 @@
       ]
     },
     "System.Reflection.Primitives/4.0.1": {
-      "sha512": "4inTox4wTBaDhB7V3mPvp9XlCbeGYWVEM9/fXALd52vNEAVisc1BoVWQPuUuD0Ga//dNbA/WeMy9u9mzLxGTHQ==",
+      "sha512": "C4A6HT9TfSfQ4JFI4eODkzF31aVk0+Atu4z+i0bhocBmAI2yxdr7T/As8ZlZzKg1zhHJkgmBodBfVTQaGZdtxQ==",
       "type": "package",
       "files": [
         "System.Reflection.Primitives.4.0.1.nupkg.sha512",
@@ -19709,7 +19795,7 @@
       ]
     },
     "System.Resources.ResourceManager/4.0.1": {
-      "sha512": "TxwVeUNoTgUOdQ09gfTjvW411MF+w9MBYL7AtNVc+HtBCFlutPLhUCdZjNkjbhj3bNQWMdHboF0KIWEOjJssbA==",
+      "sha512": "ANP2maRg1TgSLNsZvGA3Gt0gFNlLAjAv/dsQnVoneCuaRzsm2aRNpQUAzXoVmtYGoXY0ir+7HMt4oBtWGhncMg==",
       "type": "package",
       "files": [
         "System.Resources.ResourceManager.4.0.1.nupkg.sha512",
@@ -19930,7 +20016,7 @@
       ]
     },
     "System.Runtime.Handles/4.0.1": {
-      "sha512": "nCJvEKguXEvk2ymk1gqj625vVnlK3/xdGzx0vOKicQkoquaTBJTP13AIYkocSUwHCLNBwUbXTqTWGDxBTWpt7g==",
+      "sha512": "Ur3LB6mY84NUCYAkJ4cDBM7YEHJOxEhE5A5oykZ0U2smm8Hg9n1cit3RPLOhbJ/3J6qnrQsZlTBRoepi6Tgoig==",
       "type": "package",
       "files": [
         "System.Runtime.Handles.4.0.1.nupkg.sha512",
@@ -20098,7 +20184,7 @@
       ]
     },
     "System.Runtime.Numerics/4.0.1": {
-      "sha512": "+XbKFuzdmLP3d1o9pdHu2nxjNr2OEPqGzKeegPLCUMM71a0t50A/rOcIRmGs9wR7a8KuHX6hYs/7/TymIGLNqg==",
+      "sha512": "c1t9jfmces7VzHRrGczI+z/cdMzuF19yYx32iVUup7LY+j3afhTHhmgVvdp6d9jwxLb+ND5vc1Ove2XK3Pu5QA==",
       "type": "package",
       "files": [
         "System.Runtime.Numerics.4.0.1.nupkg.sha512",
@@ -21077,7 +21163,7 @@
       ]
     },
     "System.Text.Encoding.CodePages/4.0.1": {
-      "sha512": "h4z6rrA/hxWf4655D18IIZ0eaLRa3tQC/j+e26W+VinIHY0l07iEXaAvO0YSYq3MvCjMYy8Zs5AdC1sxNQOB7Q==",
+      "sha512": "6xV40PqBKvgpUpRYFzKxF7tNR1sNDMuVu9W4iiNTe84Nx1hCyunt0vglDraChuqVuMUQIspYOMnSto2eCg6hmQ==",
       "type": "package",
       "files": [
         "System.Text.Encoding.CodePages.4.0.1.nupkg.sha512",
@@ -21686,7 +21772,7 @@
       ]
     },
     "System.Xml.XmlDocument/4.0.1": {
-      "sha512": "2eZu6IP+etFVBBFUFzw2w6J21DqIN5eL9Y8r8JfJWUmV28Z5P0SNU01oCisVHQgHsDhHPnmq2s1hJrJCFZWloQ==",
+      "sha512": "R0oc0My3JFCXrqtr1Ie6qCohe6RJGXX5lHorrFhsQ51XFJOxcoobSs2WlU4bP8BSi8oPaYWAKHvPF7DomrbzUA==",
       "type": "package",
       "files": [
         "System.Xml.XmlDocument.4.0.1.nupkg.sha512",
@@ -21792,7 +21878,8 @@
   },
   "projectFileDependencyGroups": {
     "": [
-      "Microsoft.NETCore.UniversalWindowsPlatform >= 5.2.2"
+      "Microsoft.NETCore.UniversalWindowsPlatform >= 5.2.2",
+      "Newtonsoft.Json >= 9.0.1"
     ],
     "UAP,Version=v10.0": []
   }

@@ -1,42 +1,65 @@
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+// -----------------------------------------------------------------------
+//  <copyright file="SocialManagerPresenceTitleRecord.cs" company="Microsoft">
+//      Copyright (c) Microsoft. All rights reserved.
+//      Licensed under the MIT license. See LICENSE file in the project root for full license information.
+//  </copyright>
+// -----------------------------------------------------------------------
 
 namespace Microsoft.Xbox.Services.Social.Manager
 {
-    public class SocialManagerPresenceTitleRecord
+    using global::System;
+
+    using Microsoft.Xbox.Services.Presence;
+
+    public class SocialManagerPresenceTitleRecord : IEquatable<SocialManagerPresenceTitleRecord>
     {
-
-        public Microsoft.Xbox.Services.Presence.PresenceDeviceType DeviceType
+        public SocialManagerPresenceTitleRecord(PresenceDeviceType deviceType, PresenceTitleRecord titleRecord)
         {
-            get;
-            private set;
+            this.DeviceType = deviceType;
+            this.TitleId = titleRecord.TitleId;
+            this.IsBroadcasting = titleRecord.BroadcastRecord.StartTime != DateTimeOffset.MinValue;
+            this.IsTitleActive = titleRecord.IsTitleActive;
+            this.Presence = titleRecord.Presence;
         }
 
-        public bool IsBroadcasting
+        public PresenceDeviceType DeviceType { get; private set; }
+
+        public uint TitleId { get; private set; }
+
+        public bool IsBroadcasting { get; private set; }
+
+        public bool IsTitleActive { get; private set; }
+
+        public string Presence { get; private set; }
+
+        public bool Equals(SocialManagerPresenceTitleRecord other)
         {
-            get;
-            private set;
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return this.TitleId == other.TitleId 
+                && this.IsBroadcasting == other.IsBroadcasting
+                && this.IsTitleActive == other.IsTitleActive
+                && string.Equals(this.Presence, other.Presence);
         }
 
-        public string PresenceText
+        public override bool Equals(object obj)
         {
-            get;
-            private set;
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return this.Equals((SocialManagerPresenceTitleRecord)obj);
         }
 
-        public uint TitleId
+        public override int GetHashCode()
         {
-            get;
-            private set;
+            unchecked
+            {
+                var hashCode = (int)this.TitleId;
+                hashCode = (hashCode * 397) ^ this.IsBroadcasting.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.IsTitleActive.GetHashCode();
+                hashCode = (hashCode * 397) ^ (this.Presence != null ? this.Presence.GetHashCode() : 0);
+                return hashCode;
+            }
         }
-
-        public bool IsTitleActive
-        {
-            get;
-            private set;
-        }
-
     }
 }

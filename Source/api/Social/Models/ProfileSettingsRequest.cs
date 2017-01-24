@@ -5,7 +5,6 @@ using System.Text;
 
 namespace Microsoft.Xbox.Services.Social.Models
 {
-    [Serializable]
     internal class ProfileSettingsRequest
     {
         public ProfileSettingsRequest(IEnumerable<string> xuidList, bool useDefaultSettings)

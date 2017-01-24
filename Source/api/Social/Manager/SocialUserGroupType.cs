@@ -1,7 +1,9 @@
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+// -----------------------------------------------------------------------
+//  <copyright file="SocialUserGroupType.cs" company="Microsoft">
+//      Copyright (c) Microsoft. All rights reserved.
+//      Licensed under the MIT license. See LICENSE file in the project root for full license information.
+//  </copyright>
+// -----------------------------------------------------------------------
 
 namespace Microsoft.Xbox.Services.Social.Manager
 {
@@ -10,5 +12,4 @@ namespace Microsoft.Xbox.Services.Social.Manager
         FilterType = 0,
         UserListType = 1,
     }
-
 }

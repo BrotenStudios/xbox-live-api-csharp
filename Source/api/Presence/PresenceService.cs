@@ -1,52 +1,56 @@
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+// -----------------------------------------------------------------------
+//  <copyright file="PresenceService.cs" company="Microsoft">
+//      Copyright (c) Microsoft. All rights reserved.
+//      Licensed under the MIT license. See LICENSE file in the project root for full license information.
+//  </copyright>
+// -----------------------------------------------------------------------
 
 namespace Microsoft.Xbox.Services.Presence
 {
+    using global::System;
+    using global::System.Collections.ObjectModel;
+    using global::System.Threading.Tasks;
+
     public class PresenceService
     {
-
         public event EventHandler<TitlePresenceChangeEventArgs> TitlePresenceChanged;
 
         public event EventHandler<DevicePresenceChangeEventArgs> DevicePresenceChanged;
 
-
-        public Task SetPresenceAsync(bool isUserActiveInTitle, PresenceData presenceData)
+        public virtual Task SetPresenceAsync(bool isUserActiveInTitle, PresenceData presenceData)
         {
             throw new NotImplementedException();
         }
 
         public Task SetPresenceAsync(bool isUserActiveInTitle)
         {
-            throw new NotImplementedException();
+            return this.SetPresenceAsync(isUserActiveInTitle, null);
         }
 
-        public Task<PresenceRecord> GetPresenceAsync(string xboxUserId)
+        public virtual Task<PresenceRecord> GetPresenceAsync(string xboxUserId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<global::System.Collections.ObjectModel.ReadOnlyCollection<PresenceRecord>> GetPresenceForMultipleUsersAsync(string[] xboxUserIds, Microsoft.Xbox.Services.Presence.PresenceDeviceType[] deviceTypes, uint[] titleIds, PresenceDetailLevel detailLevel, bool onlineOnly, bool broadcastingOnly)
+        public Task<ReadOnlyCollection<PresenceRecord>> GetPresenceForMultipleUsersAsync(string[] xboxUserIds, PresenceDeviceType[] deviceTypes, uint[] titleIds, PresenceDetailLevel detailLevel, bool onlineOnly, bool broadcastingOnly)
         {
             throw new NotImplementedException();
         }
 
-        public Task<global::System.Collections.ObjectModel.ReadOnlyCollection<PresenceRecord>> GetPresenceForMultipleUsersAsync(string[] xboxUserIds)
+        public Task<ReadOnlyCollection<PresenceRecord>> GetPresenceForMultipleUsersAsync(string[] xboxUserIds)
+        {
+            return this.GetPresenceForMultipleUsersAsync(xboxUserIds, null, null, PresenceDetailLevel.All, true, false);
+        }
+
+        public Task<ReadOnlyCollection<PresenceRecord>> GetPresenceForSocialGroupAsync(string socialGroup, string socialGroupOwnerXboxuserId, PresenceDeviceType[] deviceTypes, uint[] titleIds, PresenceDetailLevel detailLevel, bool onlineOnly, bool broadcastingOnly)
         {
             throw new NotImplementedException();
         }
 
-        public Task<global::System.Collections.ObjectModel.ReadOnlyCollection<PresenceRecord>> GetPresenceForSocialGroupAsync(string socialGroup, string socialGroupOwnerXboxuserId, Microsoft.Xbox.Services.Presence.PresenceDeviceType[] deviceTypes, uint[] titleIds, PresenceDetailLevel detailLevel, bool onlineOnly, bool broadcastingOnly)
+        public Task<ReadOnlyCollection<PresenceRecord>> GetPresenceForSocialGroupAsync(string socialGroup)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<global::System.Collections.ObjectModel.ReadOnlyCollection<PresenceRecord>> GetPresenceForSocialGroupAsync(string socialGroup)
-        {
-            throw new NotImplementedException();
-        }
+            return this.GetPresenceForSocialGroupAsync(socialGroup, null, null, null, PresenceDetailLevel.All, true, false)
+   ;     }
 
         public DevicePresenceChangeSubscription SubscribeToDevicePresenceChange(string xboxUserId)
         {
@@ -68,5 +72,22 @@ namespace Microsoft.Xbox.Services.Presence
             throw new NotImplementedException();
         }
 
+        protected virtual void OnTitlePresenceChanged(TitlePresenceChangeEventArgs e)
+        {
+            var onTitlePresenceChanged = this.TitlePresenceChanged;
+            if (onTitlePresenceChanged != null)
+            {
+                onTitlePresenceChanged(this, e);
+            }
+        }
+
+        protected virtual void OnDevicePresenceChanged(DevicePresenceChangeEventArgs e)
+        {
+            var onDevicePresenceChanged = this.DevicePresenceChanged;
+            if (onDevicePresenceChanged != null)
+            {
+                onDevicePresenceChanged(this, e);
+            }
+        }
     }
 }

@@ -1,90 +1,71 @@
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+// -----------------------------------------------------------------------
+//  <copyright file="XboxSocialUser.cs" company="Microsoft">
+//      Copyright (c) Microsoft. All rights reserved.
+//      Licensed under the MIT license. See LICENSE file in the project root for full license information.
+//  </copyright>
+// -----------------------------------------------------------------------
 
 namespace Microsoft.Xbox.Services.Social.Manager
 {
+    using global::System;
+
     public class XboxSocialUser
     {
+        public PreferredColor PreferredColor { get; internal set; }
 
-        public PreferredColor PreferredColor
+        public TitleHistory TitleHistory { get; internal set; }
+
+        public SocialManagerPresenceRecord PresenceRecord { get; internal set; }
+
+        public string Gamerscore { get; internal set; }
+
+        public string Gamertag { get; internal set; }
+
+        public bool UseAvatar { get; internal set; }
+
+        public string DisplayPicUrlRaw { get; internal set; }
+
+        public string RealName { get; internal set; }
+
+        public string DisplayName { get; internal set; }
+
+        public bool IsFollowedByCaller { get; internal set; }
+
+        public bool IsFollowingUser { get; internal set; }
+
+        public bool IsFavorite { get; internal set; }
+
+        public ulong XboxUserId { get; internal set; }
+
+        internal ChangeListType GetChanges(XboxSocialUser other)
         {
-            get;
-            private set;
-        }
+            ChangeListType changeType = ChangeListType.NoChange;
 
-        public TitleHistory TitleHistory
-        {
-            get;
-            private set;
-        }
+            if (!string.Equals(this.Gamertag, other.Gamertag, StringComparison.OrdinalIgnoreCase)
+                || !string.Equals(this.Gamerscore, other.Gamerscore, StringComparison.OrdinalIgnoreCase)
+                || !string.Equals(this.RealName, other.RealName, StringComparison.OrdinalIgnoreCase)
+                || !string.Equals(this.DisplayName, other.DisplayName, StringComparison.OrdinalIgnoreCase)
+                || !string.Equals(this.DisplayPicUrlRaw, other.DisplayPicUrlRaw, StringComparison.OrdinalIgnoreCase)
+                || this.UseAvatar != other.UseAvatar
+                || !this.PreferredColor.Equals(other.PreferredColor)
+                || !this.TitleHistory.Equals(other.TitleHistory))
+            {
+                changeType |= ChangeListType.ProfileChange;
+            }
 
-        public SocialManagerPresenceRecord PresenceRecord
-        {
-            get;
-            private set;
-        }
+            if (this.IsFollowedByCaller != other.IsFollowedByCaller ||
+                this.IsFollowingUser != other.IsFollowingUser ||
+                this.IsFavorite != other.IsFavorite)
+            {
+                changeType |= ChangeListType.SocialRelationshipChange;
+            }
 
-        public string Gamerscore
-        {
-            get;
-            private set;
-        }
+            if (!this.PresenceRecord.Equals(other.PresenceRecord))
+            {
+                changeType |= ChangeListType.PresenceChange;
+            }
 
-        public string Gamertag
-        {
-            get;
-            private set;
+            return changeType;
         }
-
-        public bool UseAvatar
-        {
-            get;
-            private set;
-        }
-
-        public string DisplayPicUrlRaw
-        {
-            get;
-            private set;
-        }
-
-        public string RealName
-        {
-            get;
-            private set;
-        }
-
-        public string DisplayName
-        {
-            get;
-            private set;
-        }
-
-        public bool IsFollowedByCaller
-        {
-            get;
-            private set;
-        }
-
-        public bool IsFollowingUser
-        {
-            get;
-            private set;
-        }
-
-        public bool IsFavorite
-        {
-            get;
-            private set;
-        }
-
-        public string XboxUserId
-        {
-            get;
-            private set;
-        }
-
     }
 }

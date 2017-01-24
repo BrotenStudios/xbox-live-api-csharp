@@ -1,30 +1,20 @@
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+// -----------------------------------------------------------------------
+//  <copyright file="TitlePresenceChangeEventArgs.cs" company="Microsoft">
+//      Copyright (c) Microsoft. All rights reserved.
+//      Licensed under the MIT license. See LICENSE file in the project root for full license information.
+//  </copyright>
+// -----------------------------------------------------------------------
 
 namespace Microsoft.Xbox.Services.Presence
 {
+    using global::System;
+
     public class TitlePresenceChangeEventArgs : EventArgs
     {
+        public TitlePresenceState TitleState { get; internal set; }
 
-        public TitlePresenceState TitleState
-        {
-            get;
-            private set;
-        }
+        public uint TitleId { get; internal set; }
 
-        public uint TitleId
-        {
-            get;
-            private set;
-        }
-
-        public string XboxUserId
-        {
-            get;
-            private set;
-        }
-
+        public string XboxUserId { get; internal set; }
     }
 }

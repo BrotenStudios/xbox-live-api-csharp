@@ -1,18 +1,21 @@
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+// -----------------------------------------------------------------------
+//  <copyright file="SignOutCompletedEventArgs.cs" company="Microsoft">
+//      Copyright (c) Microsoft. All rights reserved.
+//      Licensed under the MIT license. See LICENSE file in the project root for full license information.
+//  </copyright>
+// -----------------------------------------------------------------------
 
 namespace Microsoft.Xbox.Services.System
 {
+    using global::System;
+
     public class SignOutCompletedEventArgs : EventArgs
     {
-
-        public XboxLiveUser User
+        public SignOutCompletedEventArgs(XboxLiveUser user)
         {
-            get;
-            private set;
+            this.User = user;
         }
 
+        public XboxLiveUser User { get; private set; }
     }
 }

@@ -1,21 +1,23 @@
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+// -----------------------------------------------------------------------
+//  <copyright file="SocialEventType.cs" company="Microsoft">
+//      Copyright (c) Microsoft. All rights reserved.
+//      Licensed under the MIT license. See LICENSE file in the project root for full license information.
+//  </copyright>
+// -----------------------------------------------------------------------
 
 namespace Microsoft.Xbox.Services.Social.Manager
 {
-    public enum SocialEventType : int
+    public enum SocialEventType
     {
-        UsersAddedToSocialGraph = 0,
-        UsersRemovedFromSocialGraph = 1,
-        PresenceChanged = 2,
-        ProfilesChanged = 3,
-        SocialRelationshipsChanged = 4,
-        LocalUserAdded = 5,
-        LocalUserRemoved = 6,
-        SocialUserGroupLoaded = 7,
-        SocialUserGroupUpdated = 8,
+        Unknown = 0,
+        UsersAddedToSocialGraph,
+        UsersRemovedFromSocialGraph,
+        PresenceChanged,
+        ProfilesChanged,
+        SocialRelationshipsChanged,
+        LocalUserAdded,
+        LocalUserRemoved,
+        SocialUserGroupLoaded,
+        SocialUserGroupUpdated,
     }
-
 }

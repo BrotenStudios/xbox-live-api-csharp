@@ -1,11 +1,13 @@
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+// -----------------------------------------------------------------------
+//  <copyright file="PresenceFilter.cs" company="Microsoft">
+//      Copyright (c) Microsoft. All rights reserved.
+//      Licensed under the MIT license. See LICENSE file in the project root for full license information.
+//  </copyright>
+// -----------------------------------------------------------------------
 
 namespace Microsoft.Xbox.Services.Social.Manager
 {
-    public enum PresenceFilter : int
+    public enum PresenceFilter
     {
         Unknown = 0,
         TitleOnline = 1,
@@ -15,5 +17,4 @@ namespace Microsoft.Xbox.Services.Social.Manager
         AllTitle = 5,
         All = 6,
     }
-
 }

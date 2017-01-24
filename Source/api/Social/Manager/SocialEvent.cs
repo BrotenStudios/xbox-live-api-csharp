@@ -1,48 +1,35 @@
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+// -----------------------------------------------------------------------
+//  <copyright file="SocialEvent.cs" company="Microsoft">
+//      Copyright (c) Microsoft. All rights reserved.
+//      Licensed under the MIT license. See LICENSE file in the project root for full license information.
+//  </copyright>
+// -----------------------------------------------------------------------
 
 namespace Microsoft.Xbox.Services.Social.Manager
 {
+    using global::System;
+    using global::System.Collections.Generic;
+
+    using Microsoft.Xbox.Services.System;
+
     public class SocialEvent
     {
-
-        public Microsoft.Xbox.Services.Social.Manager.SocialEventArgs EventArgs
+        public SocialEvent(SocialEventType type, XboxLiveUser user, IList<ulong> usersAffected, XboxSocialUserGroup groupAffected = null)
         {
-            get;
-            private set;
+            this.EventType = type;
+            this.User = user;
+            this.UsersAffected = usersAffected;
+            this.GroupAffected = groupAffected;
         }
 
-        public string ErrorMessage
-        {
-            get;
-            private set;
-        }
+        public SocialEventType EventType { get; private set; }
 
-        public int ErrorCode
-        {
-            get;
-            private set;
-        }
+        public XboxLiveUser User { get; private set; }
 
-        public IList<string> UsersAffected
-        {
-            get;
-            private set;
-        }
+        public IList<ulong> UsersAffected { get; private set; }
 
-        public SocialEventType EventType
-        {
-            get;
-            private set;
-        }
+        public XboxSocialUserGroup GroupAffected { get; set; }
 
-        public Microsoft.Xbox.Services.System.XboxLiveUser User
-        {
-            get;
-            private set;
-        }
-
+        public Exception Exception { get; set; }
     }
 }

@@ -6,7 +6,6 @@ using System.Runtime.Serialization;
 
 namespace Microsoft.Xbox.Services.Social.Models
 {
-    [Serializable]
     public class ProfileSettingsResponse
     {
         public List<XboxUserProfile> profileUsers { get; set; }

@@ -1,64 +1,68 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
+// -----------------------------------------------------------------------
+//  <copyright file="XboxLiveHttpRequest.cs" company="Microsoft">
+//      Copyright (c) Microsoft. All rights reserved.
+//      Licensed under the MIT license. See LICENSE file in the project root for full license information.
+//  </copyright>
+// -----------------------------------------------------------------------
 
 namespace Microsoft.Xbox.Services
 {
+    using global::System;
+    using global::System.Collections.Generic;
+    using global::System.Globalization;
+    using global::System.IO;
+    using global::System.Net;
+    using global::System.Reflection;
+    using global::System.Text;
+    using global::System.Threading.Tasks;
+
     public class XboxLiveHttpRequest
     {
-        public string HttpMethod
+        private const string AuthorizationHeaderName = "Authorization";
+        private const string SignatureHeaderName = "Signature";
+        private const string ETagHeaderName = "ETag";
+        private const string DateHeaderName = "Date";
+
+        private readonly XboxLiveContextSettings contextSettings;
+        internal readonly HttpWebRequest webRequest;
+        internal readonly Dictionary<string, string> customHeaders = new Dictionary<string, string>();
+
+        internal XboxLiveHttpRequest(XboxLiveContextSettings settings, string method, string serverName, string pathQueryFragment)
         {
-            get;
-            private set;
+            this.Method = method;
+            this.Url = serverName + pathQueryFragment;
+            this.contextSettings = settings;
+            this.webRequest = (HttpWebRequest)WebRequest.Create(new Uri(this.Url));
+
+            this.SetCustomHeader("Accept-Language", CultureInfo.CurrentUICulture.ToString());
+
+            const string userAgentType = "XSAPI";
+#if !WINDOWS_UWP
+            string userAgentVersion = typeof(XboxLiveHttpRequest).Assembly.GetName().Version.ToString();
+            this.webRequest.UserAgent = userAgentType + "/" + userAgentVersion;
+#else
+            string userAgentVersion = typeof(XboxLiveHttpRequest).GetTypeInfo().Assembly.GetName().Version.ToString();
+#endif
+
+            // Current versions of XSAPI appear to send these headers instead of a standard User-Agent
+            this.SetCustomHeader("x-xbl-client-type", userAgentType);
+            this.SetCustomHeader("x-xbl-client-version", userAgentVersion);
         }
 
-        public string PathQueryFragment
-        {
-            get;
-            private set;
-        }
+        public string Method { get; private set; }
 
-        public string ServerName
-        {
-            get;
-            private set;
-        }
+        public string Url { get; private set; }
 
-        public string ContractVersionHeaderValue
-        {
-            get;
-            set;
-        }
+        public string ContractVersion { get; set; }
 
-        public string ContentTypeHeaderValue
-        {
-            get;
-            set;
-        }
-
-        public bool RetryAllowed
-        {
-            get;
-            set;
-        }
-
-        private string Url
-        {
-            get
-            {
-                return ServerName + PathQueryFragment;
-            }
-        }
+        public bool RetryAllowed { get; set; }
 
         private string Headers
         {
             get
             {
                 StringBuilder sb = new StringBuilder();
-                foreach (var header in m_CustomHeaders)
+                foreach (var header in this.customHeaders)
                 {
                     sb.AppendFormat("{0}={1};", header.Key, header.Value);
                 }
@@ -67,113 +71,108 @@ namespace Microsoft.Xbox.Services
             }
         }
 
-        private const string AuthorizationHeaderName = "Authorization";
-        private const string SignatureHeaderName = "Signature";
-        private const string ETagHeaderName = "ETag";
-        private const string DateHeaderName = "Date";
+        public string ContentType { get; set; }
 
-        private XboxLiveContextSettings m_ContextSettings;
-        private HttpWebRequest m_NetRequest;
-        private Dictionary<string, string> m_CustomHeaders = new Dictionary<string, string>();
-        private string m_RequestBody = string.Empty;
-
-        private XboxLiveHttpRequest(XboxLiveContextSettings settings, string httpMethod, string serverName, string pathQueryFragment)
-        {
-            HttpMethod = httpMethod;
-            ServerName = serverName;
-            PathQueryFragment = pathQueryFragment;
-            m_ContextSettings = settings;
-
-            m_NetRequest = (HttpWebRequest)WebRequest.Create(Url);
-            m_NetRequest.Method = HttpMethod;
-            //m_NetRequest = new HttpWebRequest(new Uri(Url));            
-        }
+        public string RequestBody { get; set; }
 
         public Task<XboxLiveHttpResponse> GetResponseWithAuth(System.XboxLiveUser user, HttpCallResponseBodyType httpCallResponseBodyType)
         {
-            return user.GetTokenAndSignatureAsync(HttpMethod, Url, Headers, m_RequestBody).ContinueWith(
-                (tokenTask) =>
+            TaskCompletionSource<XboxLiveHttpResponse> getResponseCompletionSource = new TaskCompletionSource<XboxLiveHttpResponse>();
+
+            user.GetTokenAndSignatureAsync(this.Method, this.Url, this.Headers).ContinueWith(
+                tokenTask =>
                 {
-                    string token = "";
-                    token = tokenTask.Result.Token;
-                    m_NetRequest.Headers.Add(AuthorizationHeaderName, token);
-                    m_NetRequest.Headers.Add(SignatureHeaderName, tokenTask.Result.Signature);
-                    return GetResponseWithoutAuth(httpCallResponseBodyType).Result;
-                });
-        }
+#if !WINDOWS_UWP
+                    var result = tokenTask.Result;
+                    this.webRequest.Headers.Add(AuthorizationHeaderName, string.Format("XBL3.0 x={0};{1}", result.XboxUserHash, result.Token));
+                    this.webRequest.Headers.Add(SignatureHeaderName, tokenTask.Result.Signature);
 
-        public Task<XboxLiveHttpResponse> GetResponseWithoutAuth(HttpCallResponseBodyType httpCallResponseBodyType)
-        {
-            m_NetRequest.ContentType = "application/json; charset=utf-8";
-
-            if (m_RequestBody != string.Empty)
-            {
-                m_NetRequest.ContentLength = m_RequestBody.Length;
-
-                // we have to use the async BeginGetRequestStream so that we can later use the async BeginGetResponse.  The sync
-                // and async APIs can't be mixed
-                var task = Task.Factory.FromAsync(m_NetRequest.BeginGetRequestStream, m_NetRequest.EndGetRequestStream, null)
-                    .ContinueWith((t) =>
+                    
+                    foreach (KeyValuePair<string, string> customHeader in this.customHeaders)
                     {
-                        using (Stream body = t.Result)
-                        {
-                            using (StreamWriter sw = new StreamWriter(body))
-                            {
-                                sw.Write(m_RequestBody);
-                                sw.Flush();
-                                sw.Close();
-                            }
-                        }
+                        this.webRequest.Headers.Add(customHeader.Key, customHeader.Value);
+                    }
+#endif
+
+                    this.GetResponseWithoutAuth(httpCallResponseBodyType).ContinueWith(getResponseTask =>
+                    {
+                        getResponseCompletionSource.SetResult(getResponseTask.Result);
                     });
-                task.Wait();
-            }
-
-            return Task.Factory.FromAsync(m_NetRequest.BeginGetResponse, m_NetRequest.EndGetResponse, null)
-                .ContinueWith((wrTask) =>
-                {
-                    return new XboxLiveHttpResponse((HttpWebResponse)wrTask.Result, httpCallResponseBodyType);
                 });
+
+            return getResponseCompletionSource.Task;
         }
 
-        public void SetRequestBody(string value)
+        public virtual Task<XboxLiveHttpResponse> GetResponseWithoutAuth(HttpCallResponseBodyType httpCallResponseBodyType)
         {
-            if (value == null)
+#if !WINDOWS_UWP
+            if (!string.IsNullOrEmpty(this.ContractVersion))
             {
-                return;
+                this.webRequest.Headers["x-xbl-contract-version"] = this.ContractVersion;
             }
+#endif
 
-            m_RequestBody = value;
+            TaskCompletionSource<XboxLiveHttpResponse> getResponseCompletionSource = new TaskCompletionSource<XboxLiveHttpResponse>();
+
+            this.WriteRequestBodyAsync().ContinueWith(writeBodyTask =>
+            {
+                Task.Factory.FromAsync(this.webRequest.BeginGetResponse, (Func<IAsyncResult, WebResponse>)this.webRequest.EndGetResponse, null)
+                    .ContinueWith(getResponseTask =>
+                    {
+                        bool complete = getResponseTask.IsCompleted;
+                        var response = new XboxLiveHttpResponse((HttpWebResponse)getResponseTask.Result, httpCallResponseBodyType);
+                        getResponseCompletionSource.SetResult(response);
+                    });
+            });
+
+            return getResponseCompletionSource.Task;
         }
 
-        public void SetRequestBody(byte[] value)
+        /// <summary>
+        /// If a request body has been provided, this will write it to the stream.  If there is no request body a completed task
+        /// will be returned.
+        /// </summary>
+        /// <returns>A task that represents to request body write work.</returns>
+        /// <remarks>This is used to make request chaining a little bit easier.</remarks>
+        private Task WriteRequestBodyAsync()
         {
-            // we have to use the async BeginGetRequestStream so that we can later use the async BeginGetResponse.  The sync
-            // and async APIs can't be mixed
-            var task = Task.Factory.FromAsync(m_NetRequest.BeginGetRequestStream, m_NetRequest.EndGetRequestStream, null)
-                .ContinueWith((t) =>
+            if (string.IsNullOrEmpty(this.RequestBody))
+            {
+                return Task.FromResult(true);
+            }
+
+            this.webRequest.ContentType = this.ContentType;
+
+#if !WINDOWS_UWP
+            this.webRequest.ContentLength = this.RequestBody.Length;
+#endif
+
+            // The explicit cast in the next method should not be necessary, but Visual Studio is complaining
+            // that the call is ambiguous.  This removes that in-editor error. 
+            return Task.Factory.FromAsync(this.webRequest.BeginGetRequestStream, (Func<IAsyncResult, Stream>)this.webRequest.EndGetRequestStream, null)
+                .ContinueWith(t =>
                 {
-                    Stream body = t.Result;
-                    StreamWriter sw = new StreamWriter(body);
-                    sw.Write(value);
+                    using (Stream body = t.Result)
+                    {
+                        using (StreamWriter sw = new StreamWriter(body))
+                        {
+                            sw.Write(this.RequestBody);
+                            sw.Flush();
+                        }
+                    }
                 });
-            task.Wait();
         }
 
         public void SetCustomHeader(string headerName, string headerValue)
         {
-            if (m_CustomHeaders.ContainsKey(headerName))
-            {
-                m_CustomHeaders[headerName] = headerValue;
-            }
-            else
-            {
-                m_CustomHeaders.Add(headerName, headerValue);
-            }
+            this.customHeaders[headerName] = headerValue;
         }
 
         public static XboxLiveHttpRequest Create(XboxLiveContextSettings settings, string httpMethod, string serverName, string pathQueryFragment)
         {
-            return new XboxLiveHttpRequest(settings, httpMethod, serverName, pathQueryFragment);
+            return !XboxLiveContext.UseMockData ?
+                new MockXboxLiveHttpRequest(settings, httpMethod, serverName, pathQueryFragment) :
+                new XboxLiveHttpRequest(settings, httpMethod, serverName, pathQueryFragment);
         }
     }
 }

@@ -1,24 +1,42 @@
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+// -----------------------------------------------------------------------
+//  <copyright file="TitleHistory.cs" company="Microsoft">
+//      Copyright (c) Microsoft. All rights reserved.
+//      Licensed under the MIT license. See LICENSE file in the project root for full license information.
+//  </copyright>
+// -----------------------------------------------------------------------
 
 namespace Microsoft.Xbox.Services.Social.Manager
 {
-    public class TitleHistory
+    using global::System;
+
+    public class TitleHistory : IEquatable<TitleHistory>
     {
+        public DateTimeOffset LastTimeUserPlayed { get; private set; }
 
-        public DateTimeOffset LastTimeUserPlayed
+        public bool HasUserPlayed { get; private set; }
+
+        public bool Equals(TitleHistory other)
         {
-            get;
-            private set;
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return this.LastTimeUserPlayed.Equals(other.LastTimeUserPlayed)
+                   && this.HasUserPlayed == other.HasUserPlayed;
         }
 
-        public bool HasUserPlayed
+        public override bool Equals(object obj)
         {
-            get;
-            private set;
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return this.Equals((TitleHistory)obj);
         }
 
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (this.LastTimeUserPlayed.GetHashCode() * 397) ^ this.HasUserPlayed.GetHashCode();
+            }
+        }
     }
 }

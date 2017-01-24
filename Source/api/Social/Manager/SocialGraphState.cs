@@ -1,0 +1,49 @@
+﻿// -----------------------------------------------------------------------
+//  <copyright file="SocialGraphState.cs" company="Microsoft">
+//      Copyright (c) Microsoft. All rights reserved.
+//      Licensed under the MIT license. See LICENSE file in the project root for full license information.
+//  </copyright>
+// -----------------------------------------------------------------------
+
+namespace Microsoft.Xbox.Services.Social.Manager
+{
+    using global::System;
+
+    internal enum SocialGraphState
+    {
+        Normal,
+        Diff,
+        EventProcessing,
+        Refresh
+    }
+
+    [Flags]
+    internal enum ChangeListType
+    {
+        NoChange = 0x0,
+        ProfileChange = 0x1,
+        PresenceChange = 0x2,
+        SocialRelationshipChange = 0x4,
+        Change = 0x8
+    }
+
+    internal enum InternalSocialEventType
+    {
+        Unknown,
+        UsersChanged,
+        UsersAdded,
+        UsersRemoved,
+        PresenceChanged,
+        DevicePresenceChanged,
+        TitlePresenceChanged,
+        ProfilesChanged,
+        SocialRelationshipsChanged,
+    }
+
+    internal enum EventState
+    {
+        Read,
+        ReadyToRead,
+        Clear
+    }
+}

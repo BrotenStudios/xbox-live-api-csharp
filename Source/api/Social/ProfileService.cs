@@ -1,17 +1,27 @@
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+// -----------------------------------------------------------------------
+//  <copyright file="ProfileService.cs" company="Microsoft">
+//      Copyright (c) Microsoft. All rights reserved.
+//      Licensed under the MIT license. See LICENSE file in the project root for full license information.
+//  </copyright>
+// -----------------------------------------------------------------------
 
 namespace Microsoft.Xbox.Services.Social
 {
+    using global::System;
+    using global::System.Collections.Generic;
+    using global::System.Threading.Tasks;
+
     public class ProfileService
     {
+        protected XboxLiveContextSettings settings;
+        protected XboxLiveContext context;
+        protected XboxLiveAppConfiguration config;
+
         internal ProfileService(XboxLiveAppConfiguration config, XboxLiveContext context, XboxLiveContextSettings settings)
         {
-            m_Config = config;
-            m_Context = context;
-            m_Settings = settings;
+            this.config = config;
+            this.context = context;
+            this.settings = settings;
         }
 
         public Task<XboxUserProfile> GetUserProfileAsync(string xboxUserId)
@@ -21,13 +31,9 @@ namespace Microsoft.Xbox.Services.Social
                 throw new ArgumentException("invalid xboxUserId", "xboxUserId");
             }
 
-            List<string> profiles = new List<string>();
-            profiles.Add(xboxUserId);
+            List<string> profiles = new List<string> { xboxUserId };
 
-            return GetUserProfilesAsync(profiles).ContinueWith((task) =>
-            {
-                return task.Result[0];
-            });
+            return this.GetUserProfilesAsync(profiles).ContinueWith(task => task.Result[0]);
         }
 
         public Task<List<XboxUserProfile>> GetUserProfilesAsync(List<string> xboxUserIds)
@@ -41,16 +47,14 @@ namespace Microsoft.Xbox.Services.Social
                 throw new ArgumentOutOfRangeException("xboxUserIds", "Empty list of user ids");
             }
 
-            string endpoint = XboxLiveEndpoint.GetEndpointForService("profile", m_Config);
-            XboxLiveHttpRequest req = XboxLiveHttpRequest.Create(m_Settings, "POST", endpoint, "/users/batch/profile/settings");
+            string endpoint = XboxLiveEndpoint.GetEndpointForService("profile", this.config);
+            XboxLiveHttpRequest req = XboxLiveHttpRequest.Create(this.settings, "POST", endpoint, "/users/batch/profile/settings");
 
-            req.ContractVersionHeaderValue = "2";
+            req.ContractVersion = "2";
             Models.ProfileSettingsRequest reqBodyObject = new Models.ProfileSettingsRequest(xboxUserIds, true);
-            string reqBodyString = JsonSerialization.ToJson(reqBodyObject);
+            req.RequestBody = JsonSerialization.ToJson(reqBodyObject);
 
-            req.SetRequestBody(reqBodyString);
-
-            return req.GetResponseWithAuth(m_Context.User, HttpCallResponseBodyType.JsonBody).ContinueWith<List<XboxUserProfile>>((task) =>
+            return req.GetResponseWithAuth(this.context.User, HttpCallResponseBodyType.JsonBody).ContinueWith(task =>
             {
                 XboxLiveHttpResponse response = task.Result;
                 Models.ProfileSettingsResponse responseBody = JsonSerialization.FromJson<Models.ProfileSettingsResponse>(response.ResponseBodyString);
@@ -63,9 +67,5 @@ namespace Microsoft.Xbox.Services.Social
         {
             throw new NotImplementedException();
         }
-
-        protected XboxLiveContextSettings m_Settings;
-        protected XboxLiveContext m_Context;
-        protected XboxLiveAppConfiguration m_Config;
     }
 }
