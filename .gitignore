@@ -37,6 +37,7 @@ xcuserdata
 **/*.metaproj.tmp
 **/*.opendb
 **/*.coveragexml
+**/project.lock.json
 
 Source/**/bin/
 Source/**/gen/
