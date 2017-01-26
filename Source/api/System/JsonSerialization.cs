@@ -4,6 +4,7 @@ namespace System
 {
     internal static class JsonSerialization
     {
+#if !WINDOWS_UWP
         internal static T FromJson<T>(string jsonInput)
         {
             return JsonConvert.DeserializeObject<T>(jsonInput);
@@ -13,5 +14,6 @@ namespace System
         {
             return JsonConvert.SerializeObject(input);
         }
+#endif
     }
 }

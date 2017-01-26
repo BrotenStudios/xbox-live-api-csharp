@@ -52,12 +52,16 @@ namespace Microsoft.Xbox.Services.Social
 
             req.ContractVersion = "2";
             Models.ProfileSettingsRequest reqBodyObject = new Models.ProfileSettingsRequest(xboxUserIds, true);
+#if !WINDOWS_UWP
             req.RequestBody = JsonSerialization.ToJson(reqBodyObject);
-
+#endif
             return req.GetResponseWithAuth(this.context.User, HttpCallResponseBodyType.JsonBody).ContinueWith(task =>
             {
                 XboxLiveHttpResponse response = task.Result;
-                Models.ProfileSettingsResponse responseBody = JsonSerialization.FromJson<Models.ProfileSettingsResponse>(response.ResponseBodyString);
+                Models.ProfileSettingsResponse responseBody = new Models.ProfileSettingsResponse();
+#if !WINDOWS_UWP
+                responseBody = JsonSerialization.FromJson<Models.ProfileSettingsResponse>(response.ResponseBodyString);
+#endif
 
                 return responseBody.profileUsers;
             });

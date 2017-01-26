@@ -197,6 +197,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Social\XboxUserProfile.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\GamingPrivilege.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\GetTokenAndSignatureResult.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\IXboxLiveUser.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\JsonSerialization.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\SignInResult.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\SignInStatus.cs" />

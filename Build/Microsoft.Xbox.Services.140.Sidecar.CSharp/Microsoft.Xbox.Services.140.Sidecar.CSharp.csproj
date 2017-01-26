@@ -51,6 +51,11 @@
       <HintPath>$(BuildRoot)\external\parse-sdk\release\Unity.Tasks.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\Source\api\System\Sidecar\XboxLiveUser.cs">
+      <Link>XboxLiveUser.cs</Link>
+    </Compile>
+  </ItemGroup>
   <!-- Nearly all of our source comes from the Services.Shared project -->
   <Import Project="..\..\Source\api\Microsoft.Xbox.Services.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
