@@ -51,19 +51,33 @@ namespace Microsoft.Xbox.Services.Social
             XboxLiveHttpRequest req = XboxLiveHttpRequest.Create(this.settings, "POST", endpoint, "/users/batch/profile/settings");
 
             req.ContractVersion = "2";
+            req.ContentType = "application/json; charset=utf-8";
             Models.ProfileSettingsRequest reqBodyObject = new Models.ProfileSettingsRequest(xboxUserIds, true);
-#if !WINDOWS_UWP
             req.RequestBody = JsonSerialization.ToJson(reqBodyObject);
-#endif
             return req.GetResponseWithAuth(this.context.User, HttpCallResponseBodyType.JsonBody).ContinueWith(task =>
             {
                 XboxLiveHttpResponse response = task.Result;
                 Models.ProfileSettingsResponse responseBody = new Models.ProfileSettingsResponse();
-#if !WINDOWS_UWP
                 responseBody = JsonSerialization.FromJson<Models.ProfileSettingsResponse>(response.ResponseBodyString);
-#endif
 
-                return responseBody.profileUsers;
+                List<XboxUserProfile> outputUsers = new List<XboxUserProfile>();
+                foreach(Models.ProfileUser entry in responseBody.profileUsers)
+                {
+                    XboxUserProfile profile = new XboxUserProfile()
+                    {
+                        XboxUserId = entry.id,
+                        Gamertag = entry.Gamertag(),
+                        GameDisplayName = entry.GameDisplayName(),
+                        GameDisplayPictureResizeUri = new Uri(entry.GameDisplayPic()),
+                        ApplicationDisplayName = entry.AppDisplayName(),
+                        ApplicationDisplayPictureResizeUri = new Uri(entry.AppDisplayPic()),
+                        Gamerscore = entry.Gamerscore()
+                    };
+
+                    outputUsers.Add(profile);
+                }
+
+                return outputUsers;
             });
         }
 

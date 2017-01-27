@@ -22,6 +22,7 @@ namespace Microsoft.Xbox.Services
         private const string SignatureHeaderName = "Signature";
         private const string ETagHeaderName = "ETag";
         private const string DateHeaderName = "Date";
+        private const string ContentLengthHeaderName = "Content-Length";
 
         private readonly XboxLiveContextSettings contextSettings;
         internal readonly HttpWebRequest webRequest;
@@ -35,19 +36,17 @@ namespace Microsoft.Xbox.Services
             this.webRequest = (HttpWebRequest)WebRequest.Create(new Uri(this.Url));
             this.webRequest.Method = method;
 
-            this.SetCustomHeader("Accept-Language", CultureInfo.CurrentUICulture.ToString());
+            this.SetCustomHeader("Accept-Language", CultureInfo.CurrentUICulture.ToString() + "," + CultureInfo.CurrentUICulture.TwoLetterISOLanguageName);
+            this.SetCustomHeader("Accept", "*/*");
+            this.SetCustomHeader("Cache-Control", "no-cache");
 
-            const string userAgentType = "XSAPI";
+            const string userAgentType = "XboxServicesAPI";
 #if !WINDOWS_UWP
             string userAgentVersion = typeof(XboxLiveHttpRequest).Assembly.GetName().Version.ToString();
-            this.webRequest.UserAgent = userAgentType + "/" + userAgentVersion;
 #else
             string userAgentVersion = typeof(XboxLiveHttpRequest).GetTypeInfo().Assembly.GetName().Version.ToString();
 #endif
-
-            // Current versions of XSAPI appear to send these headers instead of a standard User-Agent
-            this.SetCustomHeader("x-xbl-client-type", userAgentType);
-            this.SetCustomHeader("x-xbl-client-version", userAgentVersion);
+            this.SetCustomHeader("UserAgent", userAgentType + "/" + userAgentVersion);
         }
 
         public string Method { get; private set; }
@@ -83,17 +82,9 @@ namespace Microsoft.Xbox.Services
             user.GetTokenAndSignatureAsync(this.Method, this.Url, this.Headers).ContinueWith(
                 tokenTask =>
                 {
-#if !WINDOWS_UWP
                     var result = tokenTask.Result;
-                    this.webRequest.Headers.Add(AuthorizationHeaderName, string.Format("XBL3.0 x={0};{1}", result.XboxUserHash, result.Token));
-                    this.webRequest.Headers.Add(SignatureHeaderName, tokenTask.Result.Signature);
-
-                    
-                    foreach (KeyValuePair<string, string> customHeader in this.customHeaders)
-                    {
-                        this.webRequest.Headers.Add(customHeader.Key, customHeader.Value);
-                    }
-#endif
+                    this.SetCustomHeader(AuthorizationHeaderName, result.Token);
+                    this.SetCustomHeader(SignatureHeaderName, tokenTask.Result.Signature);
 
                     this.GetResponseWithoutAuth(httpCallResponseBodyType).ContinueWith(getResponseTask =>
                     {
@@ -106,12 +97,15 @@ namespace Microsoft.Xbox.Services
 
         public virtual Task<XboxLiveHttpResponse> GetResponseWithoutAuth(HttpCallResponseBodyType httpCallResponseBodyType)
         {
-#if !WINDOWS_UWP
             if (!string.IsNullOrEmpty(this.ContractVersion))
             {
-                this.webRequest.Headers["x-xbl-contract-version"] = this.ContractVersion;
+                this.SetCustomHeader("x-xbl-contract-version", this.ContractVersion);
             }
-#endif
+
+            foreach (KeyValuePair<string, string> customHeader in this.customHeaders)
+            {
+                this.webRequest.Headers[customHeader.Key] = customHeader.Value;
+            }
 
             TaskCompletionSource<XboxLiveHttpResponse> getResponseCompletionSource = new TaskCompletionSource<XboxLiveHttpResponse>();
 
@@ -146,6 +140,8 @@ namespace Microsoft.Xbox.Services
 
 #if !WINDOWS_UWP
             this.webRequest.ContentLength = this.RequestBody.Length;
+#else
+            this.webRequest.Headers[ContentLengthHeaderName] = this.RequestBody.Length.ToString();
 #endif
 
             // The explicit cast in the next method should not be necessary, but Visual Studio is complaining

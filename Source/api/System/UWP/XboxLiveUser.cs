@@ -19,6 +19,7 @@ namespace Microsoft.Xbox.Services.System
         }
 
         private static bool? isSupported = null;
+        WebTokenResponse webTokenResponse = null;
         private TaskCompletionSource<SignInResult> signInCompletionSource = null;
         private bool IsMultiUserApplication()
         {
@@ -76,6 +77,13 @@ namespace Microsoft.Xbox.Services.System
 
         public Task<GetTokenAndSignatureResult> GetTokenAndSignatureAsync(string httpMethod, string url, string headers, byte[] body)
         {
+            string token = string.Empty;
+            string signature = string.Empty;
+            if (webTokenResponse != null)
+            {
+                token = webTokenResponse.Token;
+                signature = webTokenResponse.Properties["Signature"];
+            }
             return Task.FromResult(
                 new GetTokenAndSignatureResult
                 {
@@ -83,7 +91,9 @@ namespace Microsoft.Xbox.Services.System
                     AgeGroup = this.AgeGroup,
                     Privileges = this.Privileges,
                     XboxUserId = this.XboxUserId,
-                    WebAccountId = this.WebAccountId
+                    WebAccountId = this.WebAccountId,
+                    Token = token,
+                    Signature = signature
                 });
         }
 
@@ -125,9 +135,12 @@ namespace Microsoft.Xbox.Services.System
             if (result.ResponseStatus == WebTokenRequestStatus.Success)
             {
                 WebTokenResponse response = result.ResponseData.ElementAt(0);
+                this.webTokenResponse = response;
                 XboxUserId = response.Properties["XboxUserId"];
                 Gamertag = response.Properties["Gamertag"];
                 AgeGroup = response.Properties["AgeGroup"];
+                Privileges = response.Properties["Privileges"];
+                WebAccountId = response.WebAccount.Id;
                 IsSignedIn = true;
                 signInCompletionSource.SetResult(new SignInResult(SignInStatus.Success));
             }
