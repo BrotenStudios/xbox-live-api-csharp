@@ -33,6 +33,7 @@ namespace Microsoft.Xbox.Services
             this.Url = serverName + pathQueryFragment;
             this.contextSettings = settings;
             this.webRequest = (HttpWebRequest)WebRequest.Create(new Uri(this.Url));
+            this.webRequest.Method = method;
 
             this.SetCustomHeader("Accept-Language", CultureInfo.CurrentUICulture.ToString());
 
@@ -170,7 +171,7 @@ namespace Microsoft.Xbox.Services
 
         public static XboxLiveHttpRequest Create(XboxLiveContextSettings settings, string httpMethod, string serverName, string pathQueryFragment)
         {
-            return !XboxLiveContext.UseMockData ?
+            return XboxLiveContext.UseMockData ?
                 new MockXboxLiveHttpRequest(settings, httpMethod, serverName, pathQueryFragment) :
                 new XboxLiveHttpRequest(settings, httpMethod, serverName, pathQueryFragment);
         }
