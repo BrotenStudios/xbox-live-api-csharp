@@ -47,38 +47,65 @@ namespace Microsoft.Xbox.Services.Social
                 throw new ArgumentOutOfRangeException("xboxUserIds", "Empty list of user ids");
             }
 
-            string endpoint = XboxLiveEndpoint.GetEndpointForService("profile", this.config);
-            XboxLiveHttpRequest req = XboxLiveHttpRequest.Create(this.settings, "POST", endpoint, "/users/batch/profile/settings");
-
-            req.ContractVersion = "2";
-            req.ContentType = "application/json; charset=utf-8";
-            Models.ProfileSettingsRequest reqBodyObject = new Models.ProfileSettingsRequest(xboxUserIds, true);
-            req.RequestBody = JsonSerialization.ToJson(reqBodyObject);
-            return req.GetResponseWithAuth(this.context.User, HttpCallResponseBodyType.JsonBody).ContinueWith(task =>
+            if (XboxLiveContext.UseMockData)
             {
-                XboxLiveHttpResponse response = task.Result;
-                Models.ProfileSettingsResponse responseBody = new Models.ProfileSettingsResponse();
-                responseBody = JsonSerialization.FromJson<Models.ProfileSettingsResponse>(response.ResponseBodyString);
-
-                List<XboxUserProfile> outputUsers = new List<XboxUserProfile>();
-                foreach(Models.ProfileUser entry in responseBody.profileUsers)
+                Random rand = new Random();
+                List<XboxUserProfile> outputUsers = new List<XboxUserProfile>(xboxUserIds.Count);
+                foreach (string xuid in xboxUserIds)
                 {
+                    // generate a fake dev gamertag
+                    string gamertag = "2 dev " + rand.Next(10000);
                     XboxUserProfile profile = new XboxUserProfile()
                     {
-                        XboxUserId = entry.id,
-                        Gamertag = entry.Gamertag(),
-                        GameDisplayName = entry.GameDisplayName(),
-                        GameDisplayPictureResizeUri = new Uri(entry.GameDisplayPic()),
-                        ApplicationDisplayName = entry.AppDisplayName(),
-                        ApplicationDisplayPictureResizeUri = new Uri(entry.AppDisplayPic()),
-                        Gamerscore = entry.Gamerscore()
+                        XboxUserId = xuid,
+                        ApplicationDisplayName = gamertag,
+                        ApplicationDisplayPictureResizeUri = new Uri("http://images-eds.xboxlive.com/image?url=z951ykn43p4FqWbbFvR2Ec.8vbDhj8G2Xe7JngaTToBrrCmIEEXHC9UNrdJ6P7KI4AAOijCgOA3.jozKovAH98vieJP1ResWJCw2dp82QtambLRqzQbSIiqrCug0AvP4&format=png"),
+                        GameDisplayName = gamertag,
+                        GameDisplayPictureResizeUri = new Uri("http://images-eds.xboxlive.com/image?url=z951ykn43p4FqWbbFvR2Ec.8vbDhj8G2Xe7JngaTToBrrCmIEEXHC9UNrdJ6P7KI4AAOijCgOA3.jozKovAH98vieJP1ResWJCw2dp82QtambLRqzQbSIiqrCug0AvP4&format=png"),
+                        Gamerscore = rand.Next(250000).ToString(),
+                        Gamertag = gamertag
                     };
 
                     outputUsers.Add(profile);
                 }
 
-                return outputUsers;
-            });
+                return Task.FromResult(outputUsers);
+            }
+            else
+            {
+                string endpoint = XboxLiveEndpoint.GetEndpointForService("profile", this.config);
+                XboxLiveHttpRequest req = XboxLiveHttpRequest.Create(this.settings, "POST", endpoint, "/users/batch/profile/settings");
+
+                req.ContractVersion = "2";
+                req.ContentType = "application/json; charset=utf-8";
+                Models.ProfileSettingsRequest reqBodyObject = new Models.ProfileSettingsRequest(xboxUserIds, true);
+                req.RequestBody = JsonSerialization.ToJson(reqBodyObject);
+                return req.GetResponseWithAuth(this.context.User, HttpCallResponseBodyType.JsonBody).ContinueWith(task =>
+                {
+                    XboxLiveHttpResponse response = task.Result;
+                    Models.ProfileSettingsResponse responseBody = new Models.ProfileSettingsResponse();
+                    responseBody = JsonSerialization.FromJson<Models.ProfileSettingsResponse>(response.ResponseBodyString);
+
+                    List<XboxUserProfile> outputUsers = new List<XboxUserProfile>();
+                    foreach (Models.ProfileUser entry in responseBody.profileUsers)
+                    {
+                        XboxUserProfile profile = new XboxUserProfile()
+                        {
+                            XboxUserId = entry.id,
+                            Gamertag = entry.Gamertag(),
+                            GameDisplayName = entry.GameDisplayName(),
+                            GameDisplayPictureResizeUri = new Uri(entry.GameDisplayPic()),
+                            ApplicationDisplayName = entry.AppDisplayName(),
+                            ApplicationDisplayPictureResizeUri = new Uri(entry.AppDisplayPic()),
+                            Gamerscore = entry.Gamerscore()
+                        };
+
+                        outputUsers.Add(profile);
+                    }
+
+                    return outputUsers;
+                });
+            }
         }
 
         public Task<List<XboxUserProfile>> GetUserProfilesForSocialGroupAsync(string socialGroup)

@@ -22,7 +22,7 @@ namespace Microsoft.Xbox.Services
     using Microsoft.Xbox.Services.TitleStorage;
     using Microsoft.Xbox.Services.UserStatistics;
 
-    public class XboxLiveContext
+    public partial class XboxLiveContext
     {
         public XboxLiveContext(XboxLiveUser user)
         {
@@ -49,7 +49,14 @@ namespace Microsoft.Xbox.Services
             this.UserStatisticsService = new UserStatisticsService();
         }
 
-        public static bool UseMockData { get; set; }
+        public static bool UseMockData
+        {
+            get
+            {
+                // m_UseMockData is provided by platform-specific partial classes
+                return m_UseMockData;
+            }
+        }
 
         public XboxLiveAppConfiguration AppConfig { get; private set; }
 

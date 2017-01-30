@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>b121817d-603e-4c1b-bbc6-b5a8dbd56a5f</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Microsoft.Xbox.Services.UnityEditor</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)System\UnityEditor\XboxLiveUser.cs" >
+    <Link>System\XboxLiveUser.cs</Link></Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)UnityEditor\XboxLiveContext.cs" >
+    <Link>XboxLiveContext.cs</Link></Compile>
+  </ItemGroup>
+</Project>
