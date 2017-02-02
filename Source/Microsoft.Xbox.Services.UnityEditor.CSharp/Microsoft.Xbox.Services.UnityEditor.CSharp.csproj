@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <BuildRoot>$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), build.root))</BuildRoot>
+  </PropertyGroup>
+  <Import Project="$(BuildRoot)\build\props\buildoutput.props" />
+  <PropertyGroup>
+    <OutputPath>$(OutputPath)Plugins\</OutputPath>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.20506</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{B7130C4B-B36B-4449-80B0-60037FC2E0CD}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Microsoft.Xbox.Services</RootNamespace>
+    <AssemblyName>Microsoft.Xbox.Services.UnityEditor.CSharp</AssemblyName>
+    <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
+    <CompilerResponseFile>
+    </CompilerResponseFile>
+    <UnityProjectType>Game:1</UnityProjectType>
+    <UnityBuildTarget>StandaloneWindows:5</UnityBuildTarget>
+    <UnityVersion>5.5.0f3</UnityVersion>
+    <LangVersion Condition=" '$(VisualStudioVersion)' != '10.0' ">4</LangVersion>
+    <FileAlignment>512</FileAlignment>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <PluginLayoutPath>$(BasePluginLayoutPath)Plugins\</PluginLayoutPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="mscorlib" />
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(BuildRoot)\external\newtonsoft\9.0.1\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="Unity.Compat">
+      <HintPath>$(BuildRoot)\external\parse-sdk\release\Unity.Compat.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Tasks">
+      <HintPath>$(BuildRoot)\external\parse-sdk\release\Unity.Tasks.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="System\XboxLiveUser.cs" />
+    <Compile Include="XboxLiveContext.cs" />
+  </ItemGroup>
+  <Import Project="$(BuildRoot)\Source\api\Microsoft.Xbox.Services.Shared.projitems" Label="Shared" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="GenerateTargetFrameworkMonikerAttribute" />
+  <Target Name="LayoutPlugin" AfterTargets="Build">
+    <Message Importance="high" Text="Copying binaries to plugin layout path $(PluginLayoutPath)" />
+    <MakeDir Directories="$(PluginLayoutPath)" />
+    <Exec Command="xcopy /y /d $(OutDir)*.pdb $(PluginLayoutPath)" />
+    <Exec Command="xcopy /y /d $(OutDir)*.dll $(PluginLayoutPath)" />
+  </Target>
+  <PropertyGroup>
+    <PostBuildEvent>REM Copies libs into Unity folder if this is a git submodule of that project
+SET "pluginRoot=..\..\..\..\..\Assets\Xbox Live"
+IF NOT EXIST "%25pluginRoot%25" GOTO DONE
+set "dst=%25pluginRoot%25\Libs"
+IF NOT EXIST "%25dst%25" mkdir "%25dst%25"
+REM SET "src=..\..\Layout\$(ConfigurationName)\Plugins\"
+SET "src=$(TargetDir)"
+echo ==================================
+echo Copying from %25src%25 to %25dst%25
+echo ==================================
+copy "%25src%25" "%25dst%25"
+:DONE
+</PostBuildEvent>
+  </PropertyGroup>
+</Project>

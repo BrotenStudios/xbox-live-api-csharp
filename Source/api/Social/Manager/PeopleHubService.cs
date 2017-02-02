@@ -1,8 +1,14 @@
-﻿namespace Microsoft.Xbox.Services.Social.Manager
+﻿// -----------------------------------------------------------------------
+//  <copyright file="PeopleHubService.cs" company="Microsoft">
+//      Copyright (c) Microsoft. All rights reserved.
+//      Internal use only.
+//  </copyright>
+// -----------------------------------------------------------------------
+
+namespace Microsoft.Xbox.Services.Social.Manager
 {
     using global::System;
     using global::System.Collections.Generic;
-    using global::System.Linq;
     using global::System.Text;
     using global::System.Threading.Tasks;
 
@@ -13,39 +19,42 @@
 
     internal class PeopleHubService
     {
-        private readonly XboxLiveUser userContext;
         private readonly XboxLiveContextSettings httpCallSettings;
         private readonly XboxLiveAppConfiguration appConfig;
         private readonly string peopleHubHost;
 
-        public PeopleHubService(XboxLiveUser userContext, XboxLiveContextSettings httpCallSettings, XboxLiveAppConfiguration appConfig)
+        public PeopleHubService(XboxLiveContextSettings httpCallSettings, XboxLiveAppConfiguration appConfig)
         {
-            this.userContext = userContext;
             this.httpCallSettings = httpCallSettings;
             this.appConfig = appConfig;
             this.peopleHubHost = XboxLiveEndpoint.GetEndpointForService("peoplehub", appConfig);
         }
 
-        public Task<XboxSocialUser> GetProfileInfo(string callerXboxUserId, SocialManagerExtraDetailLevel decorations)
+        /// <summary>
+        /// Get profile information for a user.
+        /// </summary>
+        /// <param name="user">The user to get profile information for.</param>
+        /// <param name="decorations">The additional detail to include in the response</param>
+        /// <returns>Social profile information for the user.</returns>
+        public Task<XboxSocialUser> GetProfileInfo(XboxLiveUser user, SocialManagerExtraDetailLevel decorations)
         {
-            string path = "/users/me/people/xuids(" + callerXboxUserId + ")";
+            string path = "/users/me/people/xuids(" + user.XboxUserId + ")";
 
-            if ((decorations | SocialManagerExtraDetailLevel.NoExtraDetail) != SocialManagerExtraDetailLevel.NoExtraDetail)
+            path += "/decoration/";
+            if ((decorations | SocialManagerExtraDetailLevel.None) != SocialManagerExtraDetailLevel.None)
             {
-                path += "/decoration/";
-
-                if (decorations.HasFlag(SocialManagerExtraDetailLevel.TitleHistoryLevel))
+                if (decorations.HasFlag(SocialManagerExtraDetailLevel.TitleHistory))
                 {
                     path += "titlehistory(" + this.appConfig.TitleId + "),";
                 }
 
-                if (decorations.HasFlag(SocialManagerExtraDetailLevel.PreferredColorLevel))
+                if (decorations.HasFlag(SocialManagerExtraDetailLevel.PreferredColor))
                 {
                     path += "preferredcolor,";
                 }
-
-                path += "presenceDetail";
             }
+            // We always ask for presence detail. 
+            path += "presenceDetail";
 
             XboxLiveHttpRequest request = XboxLiveHttpRequest.Create(
                 this.httpCallSettings,
@@ -55,31 +64,43 @@
 
             request.ContractVersion = "1";
 
-            return request.GetResponseWithAuth(this.userContext, HttpCallResponseBodyType.JsonBody)
+            return request.GetResponseWithAuth(user, HttpCallResponseBodyType.JsonBody)
                 .ContinueWith(responseTask =>
                 {
                     var response = responseTask.Result;
                     JObject responseBody = JObject.Parse(response.ResponseBodyString);
-                    string personJson = responseBody["people"][0].ToString();
-                    XboxSocialUser user = JsonConvert.DeserializeObject<XboxSocialUser>(personJson);
                     List<XboxSocialUser> users = responseBody["people"].ToObject<List<XboxSocialUser>>();
                     return users[0];
                 });
         }
 
-        public Task<List<XboxSocialUser>> GetSocialGraph(string callerXboxUserId, SocialManagerExtraDetailLevel decorations)
+        /// <summary>
+        /// Gets the social graph details for a user.
+        /// </summary>
+        /// <param name="user">The user to request the social graph for.</param>
+        /// <param name="decorations">The additional detail to include in the response</param>
+        /// <returns>A list of all the users in the given users social graph.</returns>
+        public Task<List<XboxSocialUser>> GetSocialGraph(XboxLiveUser user, SocialManagerExtraDetailLevel decorations)
         {
-            return this.GetSocialGraph(callerXboxUserId, decorations, "social", null, false);
+            return this.GetSocialGraph(user, decorations, "social", null);
         }
 
-        public Task<List<XboxSocialUser>> GetSocialGraph(string callerXboxUserId, SocialManagerExtraDetailLevel decorations, IList<string> xboxLiveUsers)
+        /// <summary>
+        /// Gets the social graph details for a subset of the users in the given users social graph.
+        /// </summary>
+        /// <param name="user">The user to request the social graph for.</param>
+        /// <param name="decorations">The additional detail to include in the response</param>
+        /// <param name="xboxLiveUsers">The users to get social graph details for.</param>
+        /// <returns>A list of the social information for the reuested set of users in the given users social graph.</returns>
+        public Task<List<XboxSocialUser>> GetSocialGraph(XboxLiveUser user, SocialManagerExtraDetailLevel decorations, IList<string> xboxLiveUsers)
         {
-            return this.GetSocialGraph(callerXboxUserId, decorations, string.Empty, xboxLiveUsers, true);
+            return this.GetSocialGraph(user, decorations, string.Empty, xboxLiveUsers);
         }
 
-        private Task<List<XboxSocialUser>> GetSocialGraph(string callerXboxUserId, SocialManagerExtraDetailLevel decorations, string relationshipType, IList<string> xboxLiveUsers, bool isBatch)
+        private Task<List<XboxSocialUser>> GetSocialGraph(XboxLiveUser user, SocialManagerExtraDetailLevel decorations, string relationshipType, IList<string> xboxLiveUsers)
         {
-            string pathAndQuery = this.CreateSocialGraphSubpath(callerXboxUserId, decorations, relationshipType, isBatch);
+            bool isBatch = xboxLiveUsers != null && xboxLiveUsers.Count > 0;
+            string pathAndQuery = this.CreateSocialGraphSubpath(user.XboxUserId, decorations, relationshipType, isBatch);
             XboxLiveHttpRequest request = XboxLiveHttpRequest.Create(
                 this.httpCallSettings,
                 isBatch ? HttpMethod.Post : HttpMethod.Get,
@@ -94,7 +115,7 @@
                 request.RequestBody = postBody.ToString(Formatting.None);
             }
 
-            return request.GetResponseWithAuth(this.userContext, HttpCallResponseBodyType.JsonBody)
+            return request.GetResponseWithAuth(user, HttpCallResponseBodyType.JsonBody)
                 .ContinueWith(responseTask =>
                 {
                     var response = responseTask.Result;
@@ -121,16 +142,16 @@
                 path.Append("/batch");
             }
 
-            if ((decorations | SocialManagerExtraDetailLevel.NoExtraDetail) != SocialManagerExtraDetailLevel.NoExtraDetail)
+            if ((decorations | SocialManagerExtraDetailLevel.None) != SocialManagerExtraDetailLevel.None)
             {
                 path.Append("/decoration/");
 
-                if (decorations.HasFlag(SocialManagerExtraDetailLevel.TitleHistoryLevel))
+                if (decorations.HasFlag(SocialManagerExtraDetailLevel.TitleHistory))
                 {
                     path.Append("titlehistory(" + this.appConfig.TitleId + "),");
                 }
 
-                if (decorations.HasFlag(SocialManagerExtraDetailLevel.PreferredColorLevel))
+                if (decorations.HasFlag(SocialManagerExtraDetailLevel.PreferredColor))
                 {
                     path.Append("preferredcolor,");
                 }

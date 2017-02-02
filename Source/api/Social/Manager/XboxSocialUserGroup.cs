@@ -18,9 +18,18 @@ namespace Microsoft.Xbox.Services.Social.Manager
     {
         private const int MaxUsersFromList = 100;
 
-        private readonly List<ulong> userIds;
+        private readonly HashSet<ulong> userIds;
         private readonly HashSet<XboxSocialUser> users = new HashSet<XboxSocialUser>(new XboxSocialUserIdEqualityComparer());
 
+        private ISocialManager socialManager;
+        private bool disposed;
+
+        /// <summary>
+        /// Initialize an <see cref="XboxSocialUserGroup" />
+        /// </summary>
+        /// <param name="socialManager">The social manager that owns this group.</param>
+        /// <param name="localUser">The user that this group belongs to<./param>
+        /// <param name="type">The type of SocialManager group.</param>
         private XboxSocialUserGroup(XboxLiveUser localUser, SocialUserGroupType type)
         {
             this.LocalUser = localUser;
@@ -34,9 +43,7 @@ namespace Microsoft.Xbox.Services.Social.Manager
             if (userIds.Count == 0) throw new ArgumentException("You must provide at least on user id to create a group.", "userIds");
             if (userIds.Count > MaxUsersFromList) throw new ArgumentException(string.Format("You cannot provide more than {0} user ides to create a group.", MaxUsersFromList), "userIds");
 
-            this.userIds = userIds.ToList();
-            // This list will be populated as user info becomes available.
-            this.users = new HashSet<XboxSocialUser>();
+            this.userIds = new HashSet<ulong>(userIds);
         }
 
         internal XboxSocialUserGroup(XboxLiveUser localUser, PresenceFilter presenceFilter, RelationshipFilter relationshipFilter, uint titleId)
@@ -45,6 +52,8 @@ namespace Microsoft.Xbox.Services.Social.Manager
             this.PresenceFilter = presenceFilter;
             this.RelationshipFilter = relationshipFilter;
             this.TitleId = titleId;
+
+            this.userIds = new HashSet<ulong>();
         }
 
         public XboxLiveUser LocalUser { get; private set; }
@@ -57,11 +66,11 @@ namespace Microsoft.Xbox.Services.Social.Manager
 
         public uint TitleId { get; set; }
 
-        public ICollection<XboxSocialUser> Users
+        public int Count
         {
             get
             {
-                return this.users;
+                return this.users.Count;
             }
         }
 
@@ -83,7 +92,6 @@ namespace Microsoft.Xbox.Services.Social.Manager
         private void AddUser(XboxSocialUser user)
         {
             // Add their user id to our tracking list if we don't already have it.
-            // TODO: can we replace this list with a hashset as well?  Would that be any better?
             if (!this.userIds.Contains(user.XboxUserId))
             {
                 this.userIds.Add(user.XboxUserId);
@@ -190,15 +198,15 @@ namespace Microsoft.Xbox.Services.Social.Manager
                 case PresenceFilter.All:
                     return true;
                 case PresenceFilter.AllOffline:
-                    return user.PresenceRecord.UserState == UserPresenceState.Offline;
+                    return user.PresenceState == UserPresenceState.Offline;
                 case PresenceFilter.AllOnline:
-                    return user.PresenceRecord.UserState == UserPresenceState.Online;
+                    return user.PresenceState == UserPresenceState.Online;
                 case PresenceFilter.AllTitle:
                     return user.TitleHistory.HasUserPlayed;
                 case PresenceFilter.TitleOffline:
-                    return user.PresenceRecord.UserState == UserPresenceState.Offline && user.TitleHistory.HasUserPlayed;
+                    return user.PresenceState == UserPresenceState.Offline && user.TitleHistory.HasUserPlayed;
                 case PresenceFilter.TitleOnline:
-                    return user.PresenceRecord.IsUserPlayingTitle(this.TitleId);
+                    return user.IsUserPlayingTitle(this.TitleId);
                 default:
                     return false;
             }

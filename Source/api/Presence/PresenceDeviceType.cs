@@ -1,11 +1,13 @@
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+// -----------------------------------------------------------------------
+//  <copyright file="PresenceDeviceType.cs" company="Microsoft">
+//      Copyright (c) Microsoft. All rights reserved.
+//      Internal use only.
+//  </copyright>
+// -----------------------------------------------------------------------
 
 namespace Microsoft.Xbox.Services.Presence
 {
-    public enum PresenceDeviceType : int
+    public enum PresenceDeviceType
     {
         Unknown = 0,
         WindowsPhone = 1,
@@ -18,5 +20,4 @@ namespace Microsoft.Xbox.Services.Presence
         WindowsOneCore = 8,
         WindowsOneCoreMobile = 9,
     }
-
 }

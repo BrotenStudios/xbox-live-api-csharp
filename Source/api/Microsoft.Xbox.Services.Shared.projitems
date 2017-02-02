@@ -56,6 +56,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)HttpRequestMessageType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Leaderboard\LeaderboardColumn.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Leaderboard\LeaderboardRequest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Leaderboard\LeaderboardRequestType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Leaderboard\LeaderboardResult.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Leaderboard\LeaderboardRow.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Leaderboard\LeaderboardService.cs" />
@@ -160,6 +161,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)SignInUIEmphasisFeature.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SignInUIGameCategory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SignInUISettings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Social\Manager\EventQueue.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Social\Manager\InternalEventQueue.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Social\Manager\InternalSocialEvent.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Social\Manager\ISocialManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Social\Manager\MockSocialManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Social\Manager\PeopleHubService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Social\Manager\PreferredColor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Social\Manager\PresenceFilter.cs" />
@@ -172,7 +178,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Social\Manager\SocialGraphState.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Social\Manager\SocialManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Social\Manager\SocialManagerExtraDetailLevel.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Social\Manager\SocialManagerPresenceRecord.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Social\Manager\SocialManagerPresenceTitleRecord.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Social\Manager\SocialUserGroupLoadedEventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Social\Manager\SocialUserGroupType.cs" />

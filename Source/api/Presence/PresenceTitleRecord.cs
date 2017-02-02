@@ -1,54 +1,28 @@
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+// -----------------------------------------------------------------------
+//  <copyright file="PresenceTitleRecord.cs" company="Microsoft">
+//      Copyright (c) Microsoft. All rights reserved.
+//      Internal use only.
+//  </copyright>
+// -----------------------------------------------------------------------
 
 namespace Microsoft.Xbox.Services.Presence
 {
+    using global::System;
+
     public class PresenceTitleRecord
     {
+        public uint TitleId { get; set; }
 
-        public PresenceBroadcastRecord BroadcastRecord
-        {
-            get;
-            private set;
-        }
+        public string TitleName { get; set; }
 
-        public PresenceTitleViewState TitleViewState
-        {
-            get;
-            private set;
-        }
+        public PresenceBroadcastRecord BroadcastRecord { get; set; }
 
-        public string Presence
-        {
-            get;
-            private set;
-        }
+        public PresenceTitleViewState TitleViewState { get; set; }
 
-        public bool IsTitleActive
-        {
-            get;
-            private set;
-        }
+        public string Presence { get; set; }
 
-        public DateTimeOffset LastModifiedDate
-        {
-            get;
-            private set;
-        }
+        public bool IsTitleActive { get; set; }
 
-        public string TitleName
-        {
-            get;
-            private set;
-        }
-
-        public uint TitleId
-        {
-            get;
-            private set;
-        }
-
+        public DateTimeOffset LastModifiedDate { get; set; }
     }
 }

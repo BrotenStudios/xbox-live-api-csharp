@@ -17,30 +17,29 @@ namespace Microsoft.Xbox.Services.Social.Manager
     using Microsoft.Xbox.Services.RealTimeActivity;
     using Microsoft.Xbox.Services.System;
 
-    public class SocialGraph
+    internal class SocialGraph : IDisposable
     {
-        private static TimeSpan RefreshDuration = TimeSpan.FromSeconds(30);
         private const uint MaxEventsPerFrame = 5;
+
+        private static readonly TimeSpan RefreshDuration = TimeSpan.FromSeconds(30);
 
         private readonly XboxLiveContext context;
         private readonly XboxLiveUser localUser;
         private readonly SocialManagerExtraDetailLevel detailLevel;
+
         private readonly EventQueue eventQueue;
         private readonly InternalEventQueue internalEventQueue;
+        private UserBuffersHolder userBuffer;
 
         private SocialGraphState socialGraphState;
         private int numEventsThisFrame;
 
-        private bool m_isPollingRichPresence;
+        private CancellationTokenSource backgroundTaskCancellationTokenSource;
+
+        private bool isPollingRichPresence;
         private CancellationTokenSource richPresenceCancellationTokenSource;
 
-        private bool m_shouldCancel;
-
         private readonly ReaderWriterLockSlim refreshLock = new ReaderWriterLockSlim();
-
-        private uint m_userAddedContext;
-        private UserBuffersHolder userBuffer;
-        private bool m_wasDisconnected;
 
         //Action<real_time_activity_connection_state> m_stateRTAFunction;
         //Dictionary<UInt64, XboxSocialUserSubscriptions> m_socialUserSubscriptions;
@@ -50,6 +49,7 @@ namespace Microsoft.Xbox.Services.Social.Manager
         //RtaTriggerTimer m_resyncRefreshTimer;
         //xbox::services::social::social_relationship_change_subscription m_socialRelationshipChangeSubscription;
         private PeopleHubService peopleHubService;
+        private bool disposed;
 
         public SocialGraph(XboxLiveUser localUser, SocialManagerExtraDetailLevel detailLevel)
         {
@@ -57,13 +57,20 @@ namespace Microsoft.Xbox.Services.Social.Manager
             this.detailLevel = detailLevel;
 
             this.context = new XboxLiveContext(this.localUser);
-            this.peopleHubService = new PeopleHubService(this.localUser, this.context.Settings, this.context.AppConfig);
-            this.userBuffer = new UserBuffersHolder();
+            this.peopleHubService = new PeopleHubService(this.context.Settings, this.context.AppConfig);
             this.eventQueue = new EventQueue(this.localUser);
             this.internalEventQueue = new InternalEventQueue();
         }
 
         public bool IsInitialized { get; private set; }
+
+        public XboxLiveUser LocalUser
+        {
+            get
+            {
+                return this.localUser;
+            }
+        }
 
         public uint TitleId
         {
@@ -96,30 +103,27 @@ namespace Microsoft.Xbox.Services.Social.Manager
                 throw new InvalidOperationException("Unable to initialize SocialGraph twice.");
             }
 
-            // TODO: Put this somewhere it can actually be cancelled.
-            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-            this.RefreshGraphAsync(cancellationTokenSource.Token);
-            this.ProcessEventsAsync(cancellationTokenSource.Token);
+            var getProfileTask = this.peopleHubService.GetProfileInfo(this.localUser, this.detailLevel);
+            var getGraphTask = this.peopleHubService.GetSocialGraph(this.localUser, this.detailLevel);
 
-            var getProfileTask = this.peopleHubService.GetProfileInfo(this.localUser.XboxUserId, this.detailLevel).ContinueWith(
-                getProfile =>
-                {
-                    var localUserProfile = new List<XboxSocialUser> { getProfile.Result };
-                    this.userBuffer.AddUsers(localUserProfile);
-                });
-
-            var getGraphTask = this.peopleHubService.GetSocialGraph(this.localUser.XboxUserId, this.detailLevel).ContinueWith(getGraph =>
+            return Task.WhenAll(getProfileTask, getGraphTask).ContinueWith(getTasks =>
             {
-                List<XboxSocialUser> users = getGraph.Result;
-                this.userBuffer.AddUsers(users);
+                // Wait for the task to throw any exceptions.
+                getTasks.Wait();
 
-                foreach (XboxSocialUser user in users)
-                {
-                    
-                }
+                List<XboxSocialUser> users = getGraphTask.Result;
+                users.Add(getProfileTask.Result);
+
+                this.userBuffer = new UserBuffersHolder(users);
+
+
+                // Kickoff the background tasks.
+                this.backgroundTaskCancellationTokenSource = new CancellationTokenSource();
+                this.RefreshGraphAsync(this.backgroundTaskCancellationTokenSource.Token);
+                this.ProcessEventsAsync(this.backgroundTaskCancellationTokenSource.Token);
+
+                this.IsInitialized = true;
             });
-
-            return Task.WhenAll(getProfileTask, getGraphTask).ContinueWith(_ => this.IsInitialized = true);
         }
 
         public Task AddUsers(IList<ulong> users)
@@ -146,25 +150,45 @@ namespace Microsoft.Xbox.Services.Social.Manager
             return socialEvent.Task;
         }
 
-        private bool are_events_empty()
+        /// <summary>
+        /// Process all events for this social graph
+        /// </summary>
+        /// <param name="events"></param>
+        /// <returns>A list of users affected by the processed events.</returns>
+        public Dictionary<ulong, XboxSocialUser> DoWork(List<SocialEvent> events)
         {
-            throw new NotImplementedException();
-        }
+            this.refreshLock.EnterWriteLock();
+            try
+            {
+                this.numEventsThisFrame = 0;
 
-        private void clear_debug_counters()
-        {
-            throw new NotImplementedException();
-        }
+                if (this.socialGraphState == SocialGraphState.Normal)
+                {
+                    this.userBuffer.SwapIfEmpty();
 
-        private void print_debug_info()
-        {
-            throw new NotImplementedException();
+                    if (this.eventQueue.Count > 0)
+                    {
+                        foreach (SocialEvent socialEvent in this.eventQueue)
+                        {
+                            events.Add(socialEvent);
+                        }
+
+                        this.eventQueue.Clear();
+                    }
+                }
+
+                return this.userBuffer.Active.SocialUserGraph;
+            }
+            finally
+            {
+                this.refreshLock.ExitWriteLock();
+            }
         }
 
         private void EnableRichPresencePolling(bool shouldEnablePolling)
         {
-            bool wasEnabled = this.m_isPollingRichPresence;
-            this.m_isPollingRichPresence = shouldEnablePolling;
+            bool wasEnabled = this.isPollingRichPresence;
+            this.isPollingRichPresence = shouldEnablePolling;
 
 
             if (wasEnabled)
@@ -177,18 +201,6 @@ namespace Microsoft.Xbox.Services.Social.Manager
                 this.richPresenceCancellationTokenSource = new CancellationTokenSource();
                 this.RefreshPresenceAsync(this.richPresenceCancellationTokenSource.Token);
             }
-        }
-
-        private void setup_rta()
-        {
-            throw new NotImplementedException();
-        }
-
-        private void setup_rta_subscriptions(
-            bool shouldReinitialize = false
-        )
-        {
-            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -204,34 +216,42 @@ namespace Microsoft.Xbox.Services.Social.Manager
                 return;
             }
 
-            List<XboxSocialUser> userRefreshList = new List<XboxSocialUser>();
 
-            this.refreshLock.EnterWriteLock();
-            try
-            {
-                this.socialGraphState = SocialGraphState.Refresh;
-
-                foreach (XboxSocialUser graphUser in this.userBuffer.Inactive.SocialUserGraph.Values)
+            this.peopleHubService.GetSocialGraph(this.localUser, this.detailLevel)
+                .ContinueWith(t =>
                 {
-                    if (!graphUser.IsFollowedByCaller)
+                    try
                     {
-                        userRefreshList.Add(graphUser);
+                        if (!t.IsFaulted)
+                        {
+                            this.refreshLock.EnterWriteLock();
+                            this.socialGraphState = SocialGraphState.Refresh;
+
+                            List<XboxSocialUser> userRefreshList = new List<XboxSocialUser>();
+                            foreach (XboxSocialUser graphUser in this.userBuffer.Inactive.SocialUserGraph.Values)
+                            {
+                                if (!graphUser.IsFollowedByCaller)
+                                {
+                                    userRefreshList.Add(graphUser);
+                                }
+                            }
+
+                            // TODO: We have some RTA triggers to called based on the userRefreshList.
+
+                            // Regardless, we can perform the diff which will give us any change events.
+                            this.PerformDiff(t.Result);
+                        }
                     }
-                }
-
-                // TODO: Do stuff with userRefreshList
-            }
-            finally
-            {
-                this.socialGraphState = SocialGraphState.Normal;
-                this.refreshLock.ExitWriteLock();
-                // Setup another refresh for the future.
-                Task nextRefresh = Task.Delay(RefreshDuration).ContinueWith(
-                    delayTask => this.RefreshGraphAsync(cancellationToken),
-                    cancellationToken);
-            }
-
-            this.peopleHubService.GetSocialGraph(this.localUser.XboxUserId, this.detailLevel).ContinueWith(t => { this.PerformDiff(t.Result); });
+                    finally
+                    {
+                        this.socialGraphState = SocialGraphState.Normal;
+                        this.refreshLock.ExitWriteLock();
+                        // Setup another refresh for the future.
+                        Task nextRefresh = Task.Delay(RefreshDuration).ContinueWith(
+                            delayTask => this.RefreshGraphAsync(cancellationToken),
+                            cancellationToken);
+                    }
+                });
         }
 
         private void RefreshPresenceAsync(CancellationToken cancellationToken)
@@ -278,6 +298,11 @@ namespace Microsoft.Xbox.Services.Social.Manager
                 cancellationToken);
         }
 
+        private void ProcessCachedEvents()
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Process the next event that's available and return true if there are more events to process.
         /// </summary>
@@ -296,58 +321,7 @@ namespace Microsoft.Xbox.Services.Social.Manager
                 }
             }
 
-            return !this.internalEventQueue.Empty() && this.numEventsThisFrame < MaxEventsPerFrame;
-        }
-
-        private void presence_timer_callback(IList<string> users)
-        {
-            throw new NotImplementedException();
-        }
-
-        private Task<IList<XboxSocialUser>> social_graph_timer_callback(IList<string> users, object completionContext)
-        {
-            TaskCompletionSource<IList<XboxSocialUser>> tcs = new TaskCompletionSource<IList<XboxSocialUser>>();
-
-            this.peopleHubService.GetSocialGraph(this.localUser.XboxUserId, this.detailLevel, users).ContinueWith(t =>
-            {
-                List<XboxSocialUser> socialUsers = t.Result;
-                this.internalEventQueue.Enqueue(InternalSocialEventType.UsersChanged, socialUsers).ContinueWith(eventTask =>
-                {
-                    tcs.SetResult(socialUsers);
-                });
-            });
-
-            return tcs.Task;
-        }
-
-        private void update_graph(IList<XboxSocialUser> userList)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void handle_title_presence_change(TitlePresenceChangeEventArgs titlePresenceChanged)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void handle_device_presence_change(DevicePresenceChangeEventArgs devicePresenceChanged)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void handle_social_relationship_change(SocialRelationshipChangeEventArgs socialRelationshipChanged)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void handle_rta_subscription_error(RealTimeActivitySubscriptionErrorEventArgs rtaErrorEventArgs)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void handle_rta_connection_state_change(RealTimeActivityConnectionState rtaState)
-        {
-            throw new NotImplementedException();
+            return !this.internalEventQueue.IsEmpty && this.numEventsThisFrame < MaxEventsPerFrame;
         }
 
         private void PerformDiff(List<XboxSocialUser> xboxSocialUsers)
@@ -359,7 +333,7 @@ namespace Microsoft.Xbox.Services.Social.Manager
 
                 List<XboxSocialUser> usersAddedList = new List<XboxSocialUser>();
                 List<ulong> usersRemovedList = new List<ulong>();
-                List<SocialManagerPresenceRecord> presenceChangeList = new List<SocialManagerPresenceRecord>();
+                List<XboxSocialUser> presenceChangeList = new List<XboxSocialUser>();
                 List<XboxSocialUser> socialRelationshipChangeList = new List<XboxSocialUser>();
                 List<XboxSocialUser> profileChangeList = new List<XboxSocialUser>();
 
@@ -375,7 +349,7 @@ namespace Microsoft.Xbox.Services.Social.Manager
                     var changes = existingUser.GetChanges(currentUser);
                     if (changes.HasFlag(ChangeListType.ProfileChange))
                     {
-                        presenceChangeList.Add(currentUser.PresenceRecord);
+                        presenceChangeList.Add(currentUser);
                     }
 
                     if (changes.HasFlag(ChangeListType.SocialRelationshipChange))
@@ -391,7 +365,12 @@ namespace Microsoft.Xbox.Services.Social.Manager
 
                 foreach (XboxSocialUser socialUser in this.userBuffer.Inactive.SocialUserGraph.Values)
                 {
-                    if (!xboxSocialUsers.Contains(socialUser))
+                    if (socialUser.XboxUserId.ToString() == this.localUser.XboxUserId)
+                    {
+                        continue;
+                    }
+
+                    if (!xboxSocialUsers.Contains(socialUser, XboxSocialUserIdEqualityComparer.Instance))
                     {
                         usersRemovedList.Add(socialUser.XboxUserId);
                     }
@@ -423,11 +402,6 @@ namespace Microsoft.Xbox.Services.Social.Manager
                 this.socialGraphState = SocialGraphState.Normal;
                 this.refreshLock.ExitWriteLock();
             }
-        }
-
-        private void process_cached_events()
-        {
-            throw new NotImplementedException();
         }
 
         private void ApplyEvent(InternalSocialEvent internalEvent, bool isFreshEvent)
@@ -486,28 +460,13 @@ namespace Microsoft.Xbox.Services.Social.Manager
             }
         }
 
-        private void setup_device_and_presence_subscriptions(IList<ulong> users)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void setup_device_and_presence_subscriptions_helper(IList<ulong> users)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void unsubscribe_users(IList<ulong> users)
-        {
-            throw new NotImplementedException();
-        }
-
         private void ApplyUsersAddedEvent(InternalSocialEvent socialEvent, bool isFreshEvent)
         {
             List<XboxSocialUser> usersAdded = new List<XboxSocialUser>();
 
             foreach (XboxSocialUser socialUser in socialEvent.UsersAffected)
             {
-                if (this.userBuffer.Inactive.TryAdd(socialUser) == null)
+                if (this.userBuffer.Inactive.TryAdd(socialUser))
                 {
                     usersAdded.Add(socialUser);
                 }
@@ -553,7 +512,11 @@ namespace Microsoft.Xbox.Services.Social.Manager
 
         private void ApplyUsersRemovedEvent(InternalSocialEvent socialEvent, UserBuffer inactiveBuffer, bool isFreshEvent)
         {
-            throw new NotImplementedException();
+            this.userBuffer.Inactive.Enqueue(socialEvent);
+            foreach (XboxSocialUser user in socialEvent.UsersAffected)
+            {
+                
+            }
         }
 
         private void ApplyDevicePresenceChangedEvent(InternalSocialEvent socialEvent, UserBuffer inactiveBuffer, bool isFreshEvent)
@@ -571,7 +534,8 @@ namespace Microsoft.Xbox.Services.Social.Manager
             {
                 if (titlePresenceChanged.TitleState == TitlePresenceState.Ended)
                 {
-                    eventUser.PresenceRecord.RemoveTitleRecord(titlePresenceChanged.TitleId);
+                    var titleRecord = eventUser.PresenceDetails.FirstOrDefault(r => r.TitleId == titlePresenceChanged.TitleId);
+                    eventUser.PresenceDetails.Remove(titleRecord);
                 }
             }
         }
@@ -581,38 +545,102 @@ namespace Microsoft.Xbox.Services.Social.Manager
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Process all events for this social graph
-        /// </summary>
-        /// <param name="events"></param>
-        /// <returns>A list of users affected by the processed events.</returns>
-        public Dictionary<ulong, XboxSocialUser> DoWork(List<SocialEvent> events)
+        private void presence_timer_callback(IList<string> users)
         {
-            this.refreshLock.EnterWriteLock();
-            try
+            throw new NotImplementedException();
+        }
+
+        private Task<IList<XboxSocialUser>> social_graph_timer_callback(IList<string> users, object completionContext)
+        {
+            TaskCompletionSource<IList<XboxSocialUser>> tcs = new TaskCompletionSource<IList<XboxSocialUser>>();
+
+            this.peopleHubService.GetSocialGraph(this.localUser, this.detailLevel, users).ContinueWith(getSocialGraphTask =>
             {
-                this.numEventsThisFrame = 0;
-
-                if (this.socialGraphState == SocialGraphState.Normal)
+                if (getSocialGraphTask.IsFaulted)
                 {
-                    this.userBuffer.SwapIfEmpty();
-
-                    if (this.eventQueue.Count > 0)
-                    {
-                        foreach (SocialEvent socialEvent in this.eventQueue)
-                        {
-                            events.Add(socialEvent);
-                        }
-
-                        this.eventQueue.Clear();
-                    }
+                    tcs.SetException(getSocialGraphTask.Exception);
+                    return;
                 }
 
-                return this.userBuffer.Active.SocialUserGraph;
-            }
-            finally
+                List<XboxSocialUser> socialUsers = getSocialGraphTask.Result;
+                this.internalEventQueue.Enqueue(InternalSocialEventType.UsersChanged, socialUsers).ContinueWith(enqueueTask =>
+                {
+                    if (enqueueTask.IsFaulted)
+                    {
+                        tcs.SetException(enqueueTask.Exception);
+                        return;
+                    }
+
+                    tcs.SetResult(socialUsers);
+                });
+            });
+
+            return tcs.Task;
+        }
+
+        private void setup_rta()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void setup_rta_subscriptions(
+            bool shouldReinitialize = false
+        )
+        {
+            throw new NotImplementedException();
+        }
+
+        private void update_graph(IList<XboxSocialUser> userList)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void handle_title_presence_change(TitlePresenceChangeEventArgs titlePresenceChanged)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void handle_device_presence_change(DevicePresenceChangeEventArgs devicePresenceChanged)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void handle_social_relationship_change(SocialRelationshipChangeEventArgs socialRelationshipChanged)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void handle_rta_subscription_error(RealTimeActivitySubscriptionErrorEventArgs rtaErrorEventArgs)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void handle_rta_connection_state_change(RealTimeActivityConnectionState rtaState)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void setup_device_and_presence_subscriptions(IList<ulong> users)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void setup_device_and_presence_subscriptions_helper(IList<ulong> users)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void unsubscribe_users(IList<ulong> users)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Dispose()
+        {
+            if (!this.disposed)
             {
-                this.refreshLock.ExitWriteLock();
+                this.backgroundTaskCancellationTokenSource.Cancel();
+                this.disposed = true;
             }
         }
     }

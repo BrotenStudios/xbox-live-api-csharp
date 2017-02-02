@@ -11,9 +11,9 @@ namespace Microsoft.Xbox.Services.Social.Manager
 
     public class TitleHistory : IEquatable<TitleHistory>
     {
-        public DateTimeOffset LastTimeUserPlayed { get; private set; }
+        public DateTimeOffset LastTimeUserPlayed { get; set; }
 
-        public bool HasUserPlayed { get; private set; }
+        public bool HasUserPlayed { get; set; }
 
         public bool Equals(TitleHistory other)
         {

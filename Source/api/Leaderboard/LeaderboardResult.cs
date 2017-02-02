@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Xbox.Services.Leaderboard
 {
-    using global::Leaderboard;
-
     public class LeaderboardResult
     {
         private readonly XboxLiveContext context;

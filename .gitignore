@@ -5,8 +5,8 @@
 
 **/.vs/
 
-#nuget packages
-External/Packages/*
+#NuGet packages
+**/[pP]ackages/*
 
 # Xcode
 

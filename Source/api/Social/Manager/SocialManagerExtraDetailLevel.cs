@@ -12,8 +12,8 @@ namespace Microsoft.Xbox.Services.Social.Manager
     [Flags]
     public enum SocialManagerExtraDetailLevel
     {
-        NoExtraDetail = 0x0,
-        TitleHistoryLevel = 0x1,
-        PreferredColorLevel = 0x2,
+        None = 0x0,
+        TitleHistory = 0x1,
+        PreferredColor = 0x2,
     }
 }

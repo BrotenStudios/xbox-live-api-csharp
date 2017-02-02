@@ -36,7 +36,7 @@ namespace Microsoft.Xbox.Services
             this.webRequest = (HttpWebRequest)WebRequest.Create(new Uri(this.Url));
             this.webRequest.Method = method;
 
-            this.SetCustomHeader("Accept-Language", CultureInfo.CurrentUICulture.ToString() + "," + CultureInfo.CurrentUICulture.TwoLetterISOLanguageName);
+            this.SetCustomHeader("Accept-Language", CultureInfo.CurrentUICulture + "," + CultureInfo.CurrentUICulture.TwoLetterISOLanguageName);
             this.SetCustomHeader("Accept", "*/*");
             this.SetCustomHeader("Cache-Control", "no-cache");
 
@@ -82,12 +82,23 @@ namespace Microsoft.Xbox.Services
             user.GetTokenAndSignatureAsync(this.Method, this.Url, this.Headers).ContinueWith(
                 tokenTask =>
                 {
+                    if (tokenTask.IsFaulted)
+                    {
+                        getResponseCompletionSource.SetException(tokenTask.Exception);
+                        return;
+                    }
+
                     var result = tokenTask.Result;
-                    this.SetCustomHeader(AuthorizationHeaderName, result.Token);
+                    this.SetCustomHeader(AuthorizationHeaderName, string.Format("XBL3.0 x={0};{1}", result.XboxUserHash, result.Token));
                     this.SetCustomHeader(SignatureHeaderName, tokenTask.Result.Signature);
 
                     this.GetResponseWithoutAuth(httpCallResponseBodyType).ContinueWith(getResponseTask =>
                     {
+                        if (getResponseTask.IsFaulted)
+                        {
+                            getResponseCompletionSource.SetException(getResponseTask.Exception);
+                        }
+
                         getResponseCompletionSource.SetResult(getResponseTask.Result);
                     });
                 });
@@ -111,10 +122,17 @@ namespace Microsoft.Xbox.Services
 
             this.WriteRequestBodyAsync().ContinueWith(writeBodyTask =>
             {
+                // The explicit cast in the next method should not be necessary, but Visual Studio is complaining
+                // that the call is ambiguous.  This removes that in-editor error. 
                 Task.Factory.FromAsync(this.webRequest.BeginGetResponse, (Func<IAsyncResult, WebResponse>)this.webRequest.EndGetResponse, null)
                     .ContinueWith(getResponseTask =>
                     {
-                        bool complete = getResponseTask.IsCompleted;
+                        if (getResponseTask.IsFaulted)
+                        {
+                            getResponseCompletionSource.SetException(getResponseTask.Exception);
+                            return;
+                        }
+
                         var response = new XboxLiveHttpResponse((HttpWebResponse)getResponseTask.Result, httpCallResponseBodyType);
                         getResponseCompletionSource.SetResult(response);
                     });

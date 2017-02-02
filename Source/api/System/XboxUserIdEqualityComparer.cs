@@ -42,6 +42,16 @@ namespace Microsoft.Xbox.Services.System
     /// </remarks>
     public sealed class XboxSocialUserIdEqualityComparer : IEqualityComparer<XboxSocialUser>
     {
+        private static XboxSocialUserIdEqualityComparer instance;
+
+        public static XboxSocialUserIdEqualityComparer Instance
+        {
+            get
+            {
+                return instance ?? (instance = new XboxSocialUserIdEqualityComparer());
+            }
+        }
+
         public bool Equals(XboxSocialUser x, XboxSocialUser y)
         {
             if (ReferenceEquals(x, y)) return true;

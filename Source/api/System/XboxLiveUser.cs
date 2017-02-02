@@ -8,10 +8,6 @@
 namespace Microsoft.Xbox.Services.System
 {
     using global::System;
-    using global::System.Collections.Generic;
-    using global::System.Runtime.InteropServices;
-    using global::System.Text;
-    using global::System.Threading.Tasks;
 
     public partial class XboxLiveUser : IXboxLiveUser
     {

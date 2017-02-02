@@ -5,15 +5,8 @@
 //  </copyright>
 // -----------------------------------------------------------------------
 
-namespace Leaderboard
+namespace Microsoft.Xbox.Services.Leaderboard
 {
-    internal enum LeaderboardRequestType
-    {
-        None,
-        Global,
-        Social,
-    }
-
     internal class LeaderboardRequest
     {
         public LeaderboardRequest(LeaderboardRequestType requestType)

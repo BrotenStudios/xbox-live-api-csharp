@@ -28,7 +28,7 @@ namespace Microsoft.Xbox.Services
         {
             this.User = user;
 
-            this.AppConfig = new XboxLiveAppConfiguration();
+            this.AppConfig = XboxLiveAppConfiguration.Instance;
             this.Settings = new XboxLiveContextSettings();
 
             this.AchievementService = new AchievementService();
@@ -47,15 +47,6 @@ namespace Microsoft.Xbox.Services
             this.StringService = new StringService();
             this.TitleStorageService = new TitleStorageService();
             this.UserStatisticsService = new UserStatisticsService();
-        }
-
-        public static bool UseMockData
-        {
-            get
-            {
-                // m_UseMockData is provided by platform-specific partial classes
-                return m_UseMockData;
-            }
         }
 
         public XboxLiveAppConfiguration AppConfig { get; private set; }

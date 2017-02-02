@@ -1,13 +1,12 @@
 ﻿// -----------------------------------------------------------------------
 //  <copyright file="MockXboxLiveHttpRequest.cs" company="Microsoft">
 //      Copyright (c) Microsoft. All rights reserved.
-//      Licensed under the MIT license. See LICENSE file in the project root for full license information.
+//      Internal use only.
 //  </copyright>
 // -----------------------------------------------------------------------
 
 namespace Microsoft.Xbox.Services
 {
-    using global::System;
     using global::System.IO;
     using global::System.Threading.Tasks;
 

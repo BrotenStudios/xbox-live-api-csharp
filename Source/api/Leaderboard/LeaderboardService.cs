@@ -7,8 +7,6 @@
 
 namespace Microsoft.Xbox.Services.Leaderboard
 {
-    using global::Leaderboard;
-
     using global::System;
     using global::System.Text;
     using global::System.Threading.Tasks;
@@ -181,14 +179,6 @@ namespace Microsoft.Xbox.Services.Leaderboard
                 Request = request
             };
             return result;
-        }
-
-        private static void AppendQueryParameterIfProvided<T>(StringBuilder builder, string parameterName, T parameterValue)
-        {
-            if (!Equals(parameterValue, default(T)))
-            {
-                AppendQueryParameter(builder, parameterName, parameterValue);
-            }
         }
 
         private static void AppendQueryParameter(StringBuilder builder, string parameterName, object parameterValue)

@@ -1,48 +1,48 @@
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+// -----------------------------------------------------------------------
+//  <copyright file="XboxLiveAppConfiguration.cs" company="Microsoft">
+//      Copyright (c) Microsoft. All rights reserved.
+//      Internal use only.
+//  </copyright>
+// -----------------------------------------------------------------------
 
 namespace Microsoft.Xbox.Services
 {
+    using global::System.IO;
+
+    using Newtonsoft.Json;
+
     public class XboxLiveAppConfiguration
     {
+        private const string appConfigurationPath = "XboxServices.config";
 
-        public SignInUISettings AppSignInUISettings
+        private static XboxLiveAppConfiguration instance;
+
+        public static XboxLiveAppConfiguration Instance
         {
-            get;
-            private set;
+            get
+            {
+                if (instance == null)
+                {
+                    string configContent = File.ReadAllText(appConfigurationPath);
+                    instance = JsonConvert.DeserializeObject<XboxLiveAppConfiguration>(configContent);
+                }
+
+                return instance;
+            }
         }
 
-        public string Sandbox
+        private XboxLiveAppConfiguration()
         {
-            get;
-            private set;
         }
 
-        public string Environment
-        {
-            get;
-            private set;
-        }
+        public SignInUISettings AppSignInUISettings { get; set; }
 
-        public string ServiceConfigurationId
-        {
-            get;
-            private set;
-        }
+        public string Sandbox { get; set; }
 
-        public uint TitleId
-        {
-            get;
-            private set;
-        }
+        public string Environment { get; set; }
 
-        public static XboxLiveAppConfiguration SingletonInstance
-        {
-            get;
-            private set;
-        }
+        public string ServiceConfigurationId { get; set; }
 
+        public uint TitleId { get; set; }
     }
 }

@@ -1,41 +1,55 @@
 // -----------------------------------------------------------------------
 //  <copyright file="XboxSocialUser.cs" company="Microsoft">
 //      Copyright (c) Microsoft. All rights reserved.
-//      Licensed under the MIT license. See LICENSE file in the project root for full license information.
+//      Internal use only.
 //  </copyright>
 // -----------------------------------------------------------------------
 
 namespace Microsoft.Xbox.Services.Social.Manager
 {
     using global::System;
+    using global::System.Collections.Generic;
+    using global::System.Linq;
+
+    using Microsoft.Xbox.Services.Presence;
+
+    using Newtonsoft.Json;
 
     public class XboxSocialUser
     {
-        public PreferredColor PreferredColor { get; internal set; }
+        [JsonProperty("xuid")]
+        public ulong XboxUserId { get; set; }
 
-        public TitleHistory TitleHistory { get; internal set; }
+        public string DisplayName { get; set; }
 
-        public SocialManagerPresenceRecord PresenceRecord { get; internal set; }
+        public string RealName { get; set; }
 
-        public string Gamerscore { get; internal set; }
+        public string DisplayPicRaw { get; set; }
 
-        public string Gamertag { get; internal set; }
+        public bool UseAvatar { get; set; }
 
-        public bool UseAvatar { get; internal set; }
+        public string Gamertag { get; set; }
 
-        public string DisplayPicUrlRaw { get; internal set; }
+        public string Gamerscore { get; set; }
 
-        public string RealName { get; internal set; }
+        public PreferredColor PreferredColor { get; set; }
 
-        public string DisplayName { get; internal set; }
+        public bool IsFollowedByCaller { get; set; }
 
-        public bool IsFollowedByCaller { get; internal set; }
+        public bool IsFollowingCaller { get; set; }
 
-        public bool IsFollowingUser { get; internal set; }
+        public bool IsFavorite { get; set; }
 
-        public bool IsFavorite { get; internal set; }
+        public UserPresenceState PresenceState { get; set; }
 
-        public ulong XboxUserId { get; internal set; }
+        public IList<SocialManagerPresenceTitleRecord> PresenceDetails { get; set; }
+
+        public TitleHistory TitleHistory { get; set; }
+
+        public bool IsUserPlayingTitle(uint titleId)
+        {
+            return this.PresenceDetails.Any(t => t.TitleId == titleId && t.IsTitleActive);
+        }
 
         internal ChangeListType GetChanges(XboxSocialUser other)
         {
@@ -45,22 +59,23 @@ namespace Microsoft.Xbox.Services.Social.Manager
                 || !string.Equals(this.Gamerscore, other.Gamerscore, StringComparison.OrdinalIgnoreCase)
                 || !string.Equals(this.RealName, other.RealName, StringComparison.OrdinalIgnoreCase)
                 || !string.Equals(this.DisplayName, other.DisplayName, StringComparison.OrdinalIgnoreCase)
-                || !string.Equals(this.DisplayPicUrlRaw, other.DisplayPicUrlRaw, StringComparison.OrdinalIgnoreCase)
+                || !string.Equals(this.DisplayPicRaw, other.DisplayPicRaw, StringComparison.OrdinalIgnoreCase)
                 || this.UseAvatar != other.UseAvatar
-                || !this.PreferredColor.Equals(other.PreferredColor)
-                || !this.TitleHistory.Equals(other.TitleHistory))
+                || !Equals(this.PreferredColor, other.PreferredColor)
+                || !Equals(this.TitleHistory, other.TitleHistory))
             {
                 changeType |= ChangeListType.ProfileChange;
             }
 
             if (this.IsFollowedByCaller != other.IsFollowedByCaller ||
-                this.IsFollowingUser != other.IsFollowingUser ||
+                this.IsFollowingCaller != other.IsFollowingCaller ||
                 this.IsFavorite != other.IsFavorite)
             {
                 changeType |= ChangeListType.SocialRelationshipChange;
             }
 
-            if (!this.PresenceRecord.Equals(other.PresenceRecord))
+            if (this.PresenceState != other.PresenceState ||
+                (this.PresenceDetails != null && other.PresenceDetails != null && this.PresenceDetails.All(record => other.PresenceDetails.Contains(record))))
             {
                 changeType |= ChangeListType.PresenceChange;
             }
