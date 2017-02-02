@@ -23,7 +23,14 @@ namespace Microsoft.Xbox.Services
             {
                 if (instance == null)
                 {
-                    string configContent = File.ReadAllText(appConfigurationPath);
+                    //string configContent = File.ReadAllText(appConfigurationPath);
+                    string configContent = @"
+                    {
+                      ""ServiceConfigurationId"" : ""00000000-0000-0000-0000-0000694f5acb"",
+                      ""TitleId"": ""1766808267"",
+                      ""Environment"": """",
+                      ""Sandbox"": ""JDTDWX.0"",
+                    }";
                     instance = JsonConvert.DeserializeObject<XboxLiveAppConfiguration>(configContent);
                 }
 

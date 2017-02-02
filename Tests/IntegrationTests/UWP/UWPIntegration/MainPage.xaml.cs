@@ -15,6 +15,7 @@ using Windows.UI.Xaml.Navigation;
 using Microsoft.Xbox.Services.System;
 using Windows.Security.Authentication.Web.Core;
 using System.Threading.Tasks;
+using Microsoft.Xbox.Services.Stats.Manager;
 
 #pragma warning disable 4014
 
@@ -46,9 +47,37 @@ namespace UWPIntegration
                 {
                     SignInResult res = result.Result;
                     if (res.Status == SignInStatus.Success)
+                    {
                         textBlock.Text = xblUser.Gamertag;
+                        StatsManager.Singleton.AddLocalUser(xblUser);
+                        bool isDone = false;
+                        while(!isDone)
+                        {
+                            var eventList = StatsManager.Singleton.DoWork();
+                            foreach(StatEvent evt in eventList)
+                            {
+                                if(evt.EventType == StatEventType.LocalUserAdded)
+                                {
+                                    var stat = StatsManager.Singleton.GetStat(xblUser, "kills");
+                                    int statNum = stat.AsInteger();
+                                    statNum++;
+                                    StatsManager.Singleton.SetStatAsInteger(xblUser, "kills", statNum);
+                                    StatsManager.Singleton.SetStatAsString(xblUser, "Name", "Whom");
+                                    StatsManager.Singleton.RequestFlushToService(xblUser);
+                                    StatsManager.Singleton.SetStatAsString(xblUser, "Name", "Whose");
+                                    StatsManager.Singleton.RequestFlushToService(xblUser, true);
+                                    isDone = true;
+                                }
+                            }
+
+                            Task.Delay(30).Wait();
+                        }
+                    }
                     else
+                    {
                         textBlock.Text = "Not Signed In";
+                    }
+
                 });
             });
 

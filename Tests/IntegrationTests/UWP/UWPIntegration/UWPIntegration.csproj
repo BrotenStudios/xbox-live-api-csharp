@@ -89,6 +89,9 @@
   <ItemGroup>
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
     <None Include="project.json" />
+    <Content Include="XboxServices.config">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.xaml.cs">
@@ -126,9 +129,9 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Build\Microsoft.Xbox.Services.140.UWP.CSharp\Microsoft.Xbox.Services.140.UWP.CSharp.csproj">
+    <ProjectReference Include="..\..\..\..\Source\Microsoft.Xbox.Services.UWP.CSharp\Microsoft.Xbox.Services.UWP.CSharp.csproj">
       <Project>{cfb2ca8f-6611-4dca-981c-4b7afcca19a8}</Project>
-      <Name>Microsoft.Xbox.Services.140.UWP.CSharp</Name>
+      <Name>Microsoft.Xbox.Services.UWP.CSharp</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">

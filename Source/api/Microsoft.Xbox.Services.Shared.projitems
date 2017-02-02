@@ -158,6 +158,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)RealTimeActivity\RealTimeActivitySubscriptionErrorEventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RealTimeActivity\RealTimeActivitySubscriptionState.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceCallLoggingConfig.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\CallBufferTimer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SignInUIEmphasisFeature.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SignInUIGameCategory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SignInUISettings.cs" />
@@ -200,6 +201,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)Social\XboxSocialRelationship.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Social\XboxSocialRelationshipResult.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Social\XboxUserProfile.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Stats\Manager\Models\StatsValueDocumentModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Stats\Manager\StatEvent.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Stats\Manager\StatsManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Stats\Manager\StatsService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Stats\Manager\StatsValueDocument.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Stats\Manager\StatValue.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\GamingPrivilege.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\GetTokenAndSignatureResult.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\IXboxLiveUser.cs" />

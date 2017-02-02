@@ -39,6 +39,7 @@ namespace Microsoft.Xbox.Services
             this.SetCustomHeader("Accept-Language", CultureInfo.CurrentUICulture + "," + CultureInfo.CurrentUICulture.TwoLetterISOLanguageName);
             this.SetCustomHeader("Accept", "*/*");
             this.SetCustomHeader("Cache-Control", "no-cache");
+            this.ContentType = "application/json; charset=utf-8";
 
             const string userAgentType = "XboxServicesAPI";
 #if !WINDOWS_UWP
@@ -89,9 +90,12 @@ namespace Microsoft.Xbox.Services
                     }
 
                     var result = tokenTask.Result;
+#if	!WINDOWS_UWP
                     this.SetCustomHeader(AuthorizationHeaderName, string.Format("XBL3.0 x={0};{1}", result.XboxUserHash, result.Token));
+#else
+                    this.SetCustomHeader(AuthorizationHeaderName, string.Format("{0}", result.Token));               
+#endif
                     this.SetCustomHeader(SignatureHeaderName, tokenTask.Result.Signature);
-
                     this.GetResponseWithoutAuth(httpCallResponseBodyType).ContinueWith(getResponseTask =>
                     {
                         if (getResponseTask.IsFaulted)
