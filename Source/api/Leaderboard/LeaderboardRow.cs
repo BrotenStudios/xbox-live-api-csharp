@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 
 namespace Microsoft.Xbox.Services.Leaderboard
 {
@@ -9,33 +10,27 @@ namespace Microsoft.Xbox.Services.Leaderboard
     {
         public IList<string> Values
         {
-            get;
-            set;
+            get; internal set;
         }
 
-        public uint Rank
+        public int Rank
         {
-            get;
-            set;
+            get; internal set;
         }
 
         public double Percentile
         {
-            get;
-            set;
+            get; internal set;
         }
 
         public string XboxUserId
         {
-            get;
-            set;
+            get; internal set;
         }
 
         public string Gamertag
         {
-            get;
-            set;
+            get; internal set;
         }
-
     }
 }

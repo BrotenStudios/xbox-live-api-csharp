@@ -2,61 +2,65 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Xbox.Services.System;
 
 namespace Microsoft.Xbox.Services.Leaderboard
 {
     public class LeaderboardResult
     {
-        private readonly XboxLiveContext context;
 
-        public LeaderboardResult()
+        private readonly XboxLiveUser userContext;
+        private readonly XboxLiveContextSettings xboxLiveContextSettings;
+        private readonly XboxLiveAppConfiguration appConfig;
+
+        public LeaderboardResult(
+        XboxLiveUser userContext,
+        XboxLiveContextSettings xboxLiveContextSettings,
+        XboxLiveAppConfiguration appConfig)
         {
+            this.userContext = userContext;
+            this.xboxLiveContextSettings = xboxLiveContextSettings;
+            this.appConfig = appConfig;
         }
 
         public LeaderboardResult(
-            XboxLiveContext context,
-            string displayName,
             uint totalRowCount,
             IList<LeaderboardColumn> columns,
-            IList<LeaderboardRow> rows)
+            IList<LeaderboardRow> rows,
+            XboxLiveUser userContext, 
+            XboxLiveContextSettings xboxLiveContextSettings, 
+            XboxLiveAppConfiguration appConfig)
         {
-            this.context = context;
-
-            this.DisplayName = displayName;
             this.TotalRowCount = totalRowCount;
             this.Columns = columns;
             this.Rows = rows;
-
+            this.userContext = userContext;
+            this.xboxLiveContextSettings = xboxLiveContextSettings;
+            this.appConfig = appConfig;
         }
 
         public bool HasNext
         {
             get;
-            set;
+            internal set;
         }
 
         public IList<LeaderboardRow> Rows
         {
             get;
-            set;
+            internal set;
         }
 
         public IList<LeaderboardColumn> Columns
         {
             get;
-            set;
+            internal set;
         }
 
         public uint TotalRowCount
         {
             get;
-            set;
-        }
-
-        public string DisplayName
-        {
-            get;
-            set;
+            internal set;
         }
 
         internal LeaderboardRequest Request { get; set; }
@@ -67,13 +71,14 @@ namespace Microsoft.Xbox.Services.Leaderboard
             {
                 throw new XboxException("LeaderboardResult does not have a next page.");
             }
+            LeaderboardService service = new LeaderboardService(userContext, xboxLiveContextSettings, appConfig);
 
             switch (this.Request.RequestType)
             {
                 case LeaderboardRequestType.Global:
-                    return this.context.LeaderboardService.GetLeaderboardInternal(null, null, null, null, null, 0, null, 0, this.Request.ContinuationToken);
+                    return service.GetLeaderboardInternal(null, null, null, null, null, 0, null, 0, this.Request.ContinuationToken);
                 case LeaderboardRequestType.Social:
-                    return this.context.LeaderboardService.GetLeaderboardForSocialGroupInternal(null, null, null, null, null, 0, null, 0, this.Request.ContinuationToken);
+                    return service.GetLeaderboardForSocialGroupInternal(null, null, null, null, null, 0, null, 0, this.Request.ContinuationToken);
                 default:
                     throw new InvalidOperationException("Unable to handle LeaderBoardRequestType " + this.Request.RequestType);
             }

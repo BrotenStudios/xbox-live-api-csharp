@@ -7,6 +7,7 @@
 
 namespace Microsoft.Xbox.Services
 {
+    using global::System.IO;
     using Microsoft.Xbox.Services.Achievements;
     using Microsoft.Xbox.Services.ContextualSearch;
     using Microsoft.Xbox.Services.Events;
@@ -28,14 +29,21 @@ namespace Microsoft.Xbox.Services
         {
             this.User = user;
 
-            this.AppConfig = XboxLiveAppConfiguration.Instance;
+            try
+            {
+                this.AppConfig = XboxLiveAppConfiguration.Instance;
+            }
+            catch(FileLoadException)
+            {
+                this.AppConfig = null;
+            }
             this.Settings = new XboxLiveContextSettings();
 
             this.AchievementService = new AchievementService();
             this.ContextualSearchService = new ContextualSearchService();
             this.EventsService = new EventsService();
             this.GameServerPlatformService = new GameServerPlatformService();
-            this.LeaderboardService = new LeaderboardService(this);
+            this.LeaderboardService = new LeaderboardService(user, Settings, AppConfig);
             this.MatchmakingService = new MatchmakingService();
             this.MultiplayerService = new MultiplayerService();
             this.PresenceService = new PresenceService();

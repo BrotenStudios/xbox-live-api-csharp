@@ -8,103 +8,51 @@
 namespace Microsoft.Xbox.Services.Leaderboard
 {
     using global::System;
+    using global::System.Collections.Generic;
     using global::System.Text;
     using global::System.Threading.Tasks;
+    using Newtonsoft.Json.Linq;
+    using Social.Models;
+    using System;
 
     public class LeaderboardService
     {
         private static readonly Uri leaderboardsBaseUri = new Uri("https://leaderboards.xboxlive.com");
-        private readonly XboxLiveContext context;
+        private readonly XboxLiveUser userContext;
+        private readonly XboxLiveContextSettings xboxLiveContextSettings;
+        private readonly XboxLiveAppConfiguration appConfig;
 
-        internal LeaderboardService(XboxLiveContext context)
+        internal LeaderboardService(XboxLiveUser userContext, XboxLiveContextSettings xboxLiveContextSettings, XboxLiveAppConfiguration appConfig)
         {
-            this.context = context;
+            this.userContext = userContext;
+            this.xboxLiveContextSettings = xboxLiveContextSettings;
+            this.appConfig = appConfig;
         }
 
-        public Task<LeaderboardResult> GetLeaderboardAsync(string serviceConfigurationId, string leaderboardName)
+        public Task<LeaderboardResult> GetLeaderboardAsync(string leaderboardName, LeaderboardQuery query)
         {
-            return this.GetLeaderboardAsync(serviceConfigurationId, leaderboardName, null, null, 0, uint.MaxValue);
+            string xuid = null;
+            if(query.SkipResultToMe)
+            {
+                xuid = userContext.XboxUserId;
+            }
+            return this.GetLeaderboardInternal(userContext.XboxUserId, appConfig.ServiceConfigurationId, leaderboardName, null, xuid, query.SkipResultsToRank, null, query.MaxItems, null);
         }
 
-        public Task<LeaderboardResult> GetLeaderboardAsync(string serviceConfigurationId, string leaderboardName, uint skipToRank, uint maxItems)
+        public Task<LeaderboardResult> GetSocialLeaderboardAsync(string leaderboardName, string socialGroup, LeaderboardQuery query)
         {
-            return this.GetLeaderboardAsync(serviceConfigurationId, leaderboardName, null, null, skipToRank, maxItems);
-        }
-
-        public Task<LeaderboardResult> GetLeaderboardAsync(string serviceConfigurationId, string leaderboardName, string xuid, string socialGroup, uint maxItems)
-        {
-            return this.GetLeaderboardAsync(serviceConfigurationId, leaderboardName, xuid, socialGroup, 0, maxItems);
-        }
-
-        public Task<LeaderboardResult> GetLeaderboardAsync(string serviceConfigurationId, string leaderboardName, string xuid, string socialGroup, uint skipToRank, uint maxItems)
-        {
-            return this.GetLeaderboardWithAdditionalColumnsAsync(serviceConfigurationId, leaderboardName, xuid, socialGroup, skipToRank, null, maxItems);
-        }
-
-        public virtual Task<LeaderboardResult> GetLeaderboardWithAdditionalColumnsAsync(string serviceConfigurationId, string leaderboardName, string xuid, string socialGroup, uint skipToRank, string[] additionalColumns, uint maxItems)
-        {
-            return this.GetLeaderboardInternal(xuid, serviceConfigurationId, leaderboardName, socialGroup, null, skipToRank, additionalColumns, maxItems, null);
-        }
-
-        public Task<LeaderboardResult> GetLeaderboardWithAdditionalColumnsAsync(string serviceConfigurationId, string leaderboardName, uint skipToRank, string[] additionalColumns, uint maxItems)
-        {
-            return this.GetLeaderboardWithAdditionalColumnsAsync(serviceConfigurationId, leaderboardName, null, null, skipToRank, additionalColumns, maxItems);
-        }
-
-        public Task<LeaderboardResult> GetLeaderboardWithAdditionalColumnsAsync(string serviceConfigurationId, string leaderboardName, string xuid, string socialGroup, string[] additionalColumns, uint maxItems)
-        {
-            return this.GetLeaderboardWithAdditionalColumnsAsync(serviceConfigurationId, leaderboardName, xuid, socialGroup, 0, additionalColumns, maxItems);
-        }
-
-        public Task<LeaderboardResult> GetLeaderboardWithAdditionalColumnsAsync(string serviceConfigurationId, string leaderboardName, string[] additionalColumns)
-        {
-            return this.GetLeaderboardWithAdditionalColumnsAsync(serviceConfigurationId, leaderboardName, null, null, 0, additionalColumns, 10);
-        }
-
-        public Task<LeaderboardResult> GetLeaderboardWithSkipToUserAsync(string serviceConfigurationId, string leaderboardName, string xuid, string socialGroup, string skipToXboxUserId, uint maxItems)
-        {
-            return this.GetLeaderboardWithSkipToUserWithAdditionalColumnsAsync(serviceConfigurationId, leaderboardName, xuid, socialGroup, skipToXboxUserId, null, maxItems);
-        }
-
-        public Task<LeaderboardResult> GetLeaderboardWithSkipToUserAsync(string serviceConfigurationId, string leaderboardName, string skipToXboxUserId, uint maxItems)
-        {
-            return this.GetLeaderboardWithSkipToUserWithAdditionalColumnsAsync(serviceConfigurationId, leaderboardName, null, null, skipToXboxUserId, null, maxItems);
-        }
-
-        public virtual Task<LeaderboardResult> GetLeaderboardWithSkipToUserWithAdditionalColumnsAsync(string serviceConfigurationId, string leaderboardName, string xuid, string socialGroup, string skipToXboxUserId, string[] additionalColumns, uint maxItems)
-        {
-            return this.GetLeaderboardInternal(xuid, serviceConfigurationId, leaderboardName, socialGroup, skipToXboxUserId, 0, additionalColumns, maxItems, null);
-        }
-
-        public Task<LeaderboardResult> GetLeaderboardWithSkipToUserWithAdditionalColumnsAsync(string serviceConfigurationId, string leaderboardName, string skipToXboxUserId, string[] additionalColumns, uint maxItems)
-        {
-            return this.GetLeaderboardWithSkipToUserWithAdditionalColumnsAsync(serviceConfigurationId, leaderboardName, null, null, skipToXboxUserId, additionalColumns, maxItems);
-        }
-
-        public Task<LeaderboardResult> GetLeaderboardForSocialGroupAsync(string xboxUserId, string serviceConfigurationId, string statisticName, string socialGroup, string sortOrder, uint maxItems)
-        {
-            return this.GetLeaderboardForSocialGroupWithSkipToUserAsync(xboxUserId, serviceConfigurationId, statisticName, socialGroup, null, sortOrder, maxItems);
-        }
-
-        public Task<LeaderboardResult> GetLeaderboardForSocialGroupAsync(string xboxUserId, string serviceConfigurationId, string statisticName, string socialGroup, uint maxItems)
-        {
-            return this.GetLeaderboardForSocialGroupWithSkipToUserAsync(xboxUserId, serviceConfigurationId, statisticName, socialGroup, null, null, maxItems);
-        }
-
-        public Task<LeaderboardResult> GetLeaderboardForSocialGroupWithSkipToRankAsync(string xboxUserId, string serviceConfigurationId, string statisticName, string socialGroup, uint skipToRank, string sortOrder, uint maxItems)
-        {
-            return this.GetLeaderboardForSocialGroupInternal(xboxUserId, serviceConfigurationId, statisticName, socialGroup, null, skipToRank, sortOrder, maxItems, null);
-        }
-
-        public Task<LeaderboardResult> GetLeaderboardForSocialGroupWithSkipToUserAsync(string xboxUserId, string serviceConfigurationId, string statisticName, string socialGroup, string skipToXboxUserId, string sortOrder, uint maxItems)
-        {
-            return this.GetLeaderboardForSocialGroupInternal(xboxUserId, serviceConfigurationId, statisticName, socialGroup, skipToXboxUserId, 0, sortOrder, maxItems, null);
+            string xuid = null;
+            if (query.SkipResultToMe)
+            {
+                xuid = userContext.XboxUserId;
+            }
+            return this.GetLeaderboardForSocialGroupInternal(userContext.XboxUserId, appConfig.ServiceConfigurationId, leaderboardName, socialGroup, xuid, query.SkipResultsToRank, null, query.MaxItems, null);
         }
 
         internal Task<LeaderboardResult> GetLeaderboardInternal(string xuid, string serviceConfigurationId, string leaderboardName, string socialGroup, string skipToXboxUserId, uint skipToRank, string[] additionalColumns, uint maxItems, string continuationToken)
         {
             StringBuilder requestPath = new StringBuilder();
-            requestPath.AppendFormat("/scids/{0}/leaderboards/{1}?", serviceConfigurationId, leaderboardName);
+            requestPath.AppendFormat("scids/{0}/leaderboards/{1}?", serviceConfigurationId, leaderboardName);
 
             if (xuid != null)
             {
@@ -116,7 +64,7 @@ namespace Microsoft.Xbox.Services.Leaderboard
                 AppendQueryParameter(requestPath, "maxItems", maxItems);
             }
 
-            if (string.IsNullOrEmpty(skipToXboxUserId) && skipToRank > 0)
+            if (!string.IsNullOrEmpty(skipToXboxUserId) && skipToRank > 0)
             {
                 throw new ArgumentException("Cannot provide both user and rank to skip to.");
             }
@@ -125,7 +73,7 @@ namespace Microsoft.Xbox.Services.Leaderboard
             {
                 AppendQueryParameter(requestPath, "continuationToken", continuationToken);
             }
-            else if (string.IsNullOrEmpty(skipToXboxUserId))
+            else if (!string.IsNullOrEmpty(skipToXboxUserId))
             {
                 AppendQueryParameter(requestPath, "skipToUser", skipToXboxUserId);
             }
@@ -141,11 +89,11 @@ namespace Microsoft.Xbox.Services.Leaderboard
             }
 
             // Remove the trailing query string bit
-            requestPath.Remove(requestPath.Length - 2, 1);
+            requestPath.Remove(requestPath.Length - 1, 1);
 
-            XboxLiveHttpRequest request = XboxLiveHttpRequest.Create(this.context.Settings, HttpMethod.Get, leaderboardsBaseUri.ToString(), requestPath.ToString());
-
-            return request.GetResponseWithAuth(this.context.User, HttpCallResponseBodyType.JsonBody)
+            XboxLiveHttpRequest request = XboxLiveHttpRequest.Create(xboxLiveContextSettings, HttpMethod.Get, leaderboardsBaseUri.ToString(), requestPath.ToString());
+            request.ContractVersion = "3";
+            return request.GetResponseWithAuth(userContext, HttpCallResponseBodyType.JsonBody)
                 .ContinueWith(
                     responseTask =>
                     {
@@ -157,9 +105,9 @@ namespace Microsoft.Xbox.Services.Leaderboard
         internal Task<LeaderboardResult> GetLeaderboardForSocialGroupInternal(string xboxUserId, string serviceConfigurationId, string statisticName, string socialGroup, string skipToXboxUserId, uint skipToRank, string sortOrder, uint maxItems, string continuationToken)
         {
             string requestPath = string.Format("/scids/{0}/leaderboards/{1}", serviceConfigurationId);
-            XboxLiveHttpRequest request = XboxLiveHttpRequest.Create(this.context.Settings, HttpMethod.Get, leaderboardsBaseUri.ToString(), requestPath);
+            XboxLiveHttpRequest request = XboxLiveHttpRequest.Create(xboxLiveContextSettings, HttpMethod.Get, leaderboardsBaseUri.ToString(), requestPath);
 
-            return request.GetResponseWithAuth(this.context.User, HttpCallResponseBodyType.JsonBody)
+            return request.GetResponseWithAuth(userContext, HttpCallResponseBodyType.JsonBody)
                 .ContinueWith(
                     responseTask =>
                     {
@@ -172,9 +120,35 @@ namespace Microsoft.Xbox.Services.Leaderboard
         {
             XboxLiveHttpResponse response = responseTask.Result;
 
-            request.ContinuationToken = response.Headers["Continuation-Token"];
+            LeaderboardResponse lbResponse = JsonSerialization.FromJson<LeaderboardResponse>(response.ResponseBodyString);
 
-            LeaderboardResult result = new LeaderboardResult(this.context, null, 10, null, null)
+            IList<LeaderboardColumn> columns = new List<LeaderboardColumn>() { lbResponse.LeaderboardInfo.Column };
+
+            IList<LeaderboardRow> rows = new List<LeaderboardRow>();
+            foreach(LeaderboardRowResponse row in lbResponse.Rows)
+            {
+                LeaderboardRow newRow = new LeaderboardRow()
+                {
+                    Gamertag = row.Gamertag,
+                    Percentile = row.Percentile,
+                    Rank = row.Rank,
+                    XboxUserId = row.XboxUserId,
+                };
+                if(row.Value != null)
+                {
+                    newRow.Values = new List<string>();
+                    newRow.Values.Add(row.Value);
+                }
+                else
+                {
+                    newRow.Values = row.Values;
+                }
+                rows.Add(newRow);
+            }
+
+            request.ContinuationToken = lbResponse.ContinuationToken;
+
+            LeaderboardResult result = new LeaderboardResult(lbResponse.LeaderboardInfo.TotalCount, columns, rows, userContext, xboxLiveContextSettings, appConfig)
             {
                 Request = request
             };

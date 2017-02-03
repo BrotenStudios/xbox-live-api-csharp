@@ -108,6 +108,9 @@
     </AppxManifest>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="XboxServices.config">
+      <SubType>Designer</SubType>
+    </Content>
     <None Include="Package.StoreAssociation.xml" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />

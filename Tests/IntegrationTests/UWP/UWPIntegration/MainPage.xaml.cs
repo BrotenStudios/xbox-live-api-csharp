@@ -16,6 +16,8 @@ using Microsoft.Xbox.Services.System;
 using Windows.Security.Authentication.Web.Core;
 using System.Threading.Tasks;
 using Microsoft.Xbox.Services.Stats.Manager;
+using Microsoft.Xbox.Services;
+using Microsoft.Xbox.Services.Leaderboard;
 
 #pragma warning disable 4014
 
@@ -49,29 +51,6 @@ namespace UWPIntegration
                     if (res.Status == SignInStatus.Success)
                     {
                         textBlock.Text = xblUser.Gamertag;
-                        StatsManager.Singleton.AddLocalUser(xblUser);
-                        bool isDone = false;
-                        while(!isDone)
-                        {
-                            var eventList = StatsManager.Singleton.DoWork();
-                            foreach(StatEvent evt in eventList)
-                            {
-                                if(evt.EventType == StatEventType.LocalUserAdded)
-                                {
-                                    var stat = StatsManager.Singleton.GetStat(xblUser, "kills");
-                                    int statNum = stat.AsInteger();
-                                    statNum++;
-                                    StatsManager.Singleton.SetStatAsInteger(xblUser, "kills", statNum);
-                                    StatsManager.Singleton.SetStatAsString(xblUser, "Name", "Whom");
-                                    StatsManager.Singleton.RequestFlushToService(xblUser);
-                                    StatsManager.Singleton.SetStatAsString(xblUser, "Name", "Whose");
-                                    StatsManager.Singleton.RequestFlushToService(xblUser, true);
-                                    isDone = true;
-                                }
-                            }
-
-                            Task.Delay(30).Wait();
-                        }
                     }
                     else
                     {
@@ -81,6 +60,32 @@ namespace UWPIntegration
                 });
             });
 
+        }
+
+        private void leaderboardButton_Click(object sender, RoutedEventArgs e)
+        {
+            if(xblUser.IsSignedIn)
+            {
+                XboxLiveContext services = new XboxLiveContext(xblUser);
+                try
+                {
+                    services.LeaderboardService.GetLeaderboardAsync("MostEnemysDefeated", new LeaderboardQuery()).ContinueWith((Task<LeaderboardResult> lbResult) =>
+                    {
+                        Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                        {
+                            LeaderboardResult lbRes = lbResult.Result;
+                            leaderboardData.Text = "\nrows: " + lbRes.Rows.Count + "\n";
+                            foreach (LeaderboardRow row in lbRes.Rows)
+                            {
+                                leaderboardData.Text += row.Gamertag + ": " + row.Rank + "\n";
+                            }
+                        });
+                    });
+                }
+                catch (Exception)
+                {
+                }
+            }
         }
     }
 }

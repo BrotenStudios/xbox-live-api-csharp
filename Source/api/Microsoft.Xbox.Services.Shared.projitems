@@ -54,6 +54,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)HttpCallResponseBodyType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HttpMethod.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HttpRequestMessageType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Leaderboard\LeaderboardQuery.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Leaderboard\LeaderboardResponse.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Leaderboard\LeaderboardColumn.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Leaderboard\LeaderboardRequest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Leaderboard\LeaderboardRequestType.cs" />
