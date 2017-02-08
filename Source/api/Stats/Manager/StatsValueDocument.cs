@@ -19,10 +19,7 @@ namespace Microsoft.Xbox.Services.Stats.Manager
         private List<StatPendingState> eventList;
 
         internal bool IsDirty { get; private set; }
-        internal int Version { get; set; }
-        internal int ServerVersion { get; set; }
-        internal int ClientVersion { get; set; }
-        internal string ClientId { get; set; }
+        internal int Revision { get; set; }
         internal Dictionary<string, StatValue> Stats { get; private set; }
 
         public EventHandler FlushEvent;
@@ -39,13 +36,13 @@ namespace Microsoft.Xbox.Services.Stats.Manager
                 foreach (var stat in statMap)
                 {
                     StatValue statValue;
-                    if (stat.Value.GlobalValue is string)
+                    if (stat.Value.Value is string)
                     {
-                        statValue = new StatValue(stat.Key, stat.Value.GlobalValue, StatValueType.String);
+                        statValue = new StatValue(stat.Key, stat.Value.Value, StatValueType.String);
                     }
                     else
                     {
-                        statValue = new StatValue(stat.Key, stat.Value.GlobalValue, StatValueType.Number);
+                        statValue = new StatValue(stat.Key, stat.Value.Value, StatValueType.Number);
                     }
                     Stats.Add(stat.Key, statValue);
                 }
@@ -60,12 +57,9 @@ namespace Microsoft.Xbox.Services.Stats.Manager
         {
             lock (Stats)
             {
-                if (!Stats.ContainsKey(statName))
-                {
-                    throw new ArgumentException("Stat not found in SVD");
-                }
-
-                return Stats[statName];
+                StatValue returnVal;
+                Stats.TryGetValue(statName, out returnVal);
+                return returnVal;
             }
         }
 

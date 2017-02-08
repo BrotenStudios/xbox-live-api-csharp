@@ -8,7 +8,7 @@ using Microsoft.Xbox.Services.Shared;
 
 namespace Microsoft.Xbox.Services.Stats.Manager
 {
-    public class StatsManager
+    public class StatsManager : IStatsManager
     {
         private class StatsUserContext
         {
@@ -18,7 +18,7 @@ namespace Microsoft.Xbox.Services.Stats.Manager
             public XboxLiveUser user;
         }
 
-        public static StatsManager statsManager;
+        private static IStatsManager instance;
         static readonly TimeSpan TIME_PER_CALL_SEC = new TimeSpan(0, 0, 5);
         private Dictionary<string, StatsUserContext> userStatContextMap;
         private List<StatEvent> eventList;
@@ -33,18 +33,15 @@ namespace Microsoft.Xbox.Services.Stats.Manager
             }
         }
 
-        public static StatsManager Singleton
+        public static IStatsManager Singleton
         {
             get
             {
-                if (statsManager == null)
-                {
-                    statsManager = new StatsManager();
-                }
-
-                return statsManager;
+                return instance ?? (instance = UseMockData ? new MockStatsManager() : (IStatsManager)new StatsManager());
             }
         }
+
+        public static bool UseMockData { get; set; }
 
         private StatsManager()
         {
@@ -65,7 +62,7 @@ namespace Microsoft.Xbox.Services.Stats.Manager
             }
 
             string xboxUserId = user.XboxUserId;
-            if(userStatContextMap.Keys.Contains(xboxUserId))
+            if(this.userStatContextMap.ContainsKey(xboxUserId))
             {
                 throw new ArgumentException("User already in map");
             }
@@ -202,6 +199,8 @@ namespace Microsoft.Xbox.Services.Stats.Manager
         public void RequestFlushToService(XboxLiveUser user, bool isHighPriority = false)
         {
             CheckUserValid(user);
+            this.userStatContextMap[user.XboxUserId].statsValueDocument.DoWork();
+
             List<string> userVec = new List<string>(1);
             userVec.Add(user.XboxUserId);
 
@@ -239,11 +238,15 @@ namespace Microsoft.Xbox.Services.Stats.Manager
         private void FlushToService(StatsUserContext statsUserContext)
         {
             //var serializedSVD = statsUserContext.statsValueDocument.Serialize();
-            statsUserContext.statsService.UpdateStatsValueDocument(statsUserContext.statsValueDocument).ContinueWith((continuationAction) =>
+            statsUserContext.statsService.UpdateStatsValueDocument(statsUserContext.statsValueDocument).ContinueWith((continuationTask) =>
             {
-                if(continuationAction.Status == TaskStatus.Faulted)
+#if WINDOWS_UWP
+                if(continuationTask.IsFaulted)
+#else
+                if(continuationTask.Exception == null)    // TODO: fix
+#endif
                 {
-                    if(ShouldWriteOffline(continuationAction.Exception))
+                    if (ShouldWriteOffline(continuationTask.Exception))
                     {
                         //WriteOffline(statsUserContext, serializedSVD);    // todo: add offline support
                     }
@@ -255,7 +258,7 @@ namespace Microsoft.Xbox.Services.Stats.Manager
 
                 lock(this.eventList)
                 {
-                    this.eventList.Add(new StatEvent(StatEventType.StatUpdateComplete, statsUserContext.user, continuationAction.Exception));
+                    this.eventList.Add(new StatEvent(StatEventType.StatUpdateComplete, statsUserContext.user, continuationTask.Exception));
                 }
             });
         }

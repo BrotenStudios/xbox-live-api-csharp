@@ -43,7 +43,7 @@ namespace UWPIntegration
             Windows.System.User user = null;
             if (users.Count > 0)
                 user = users[0];
-            xblUser.SignInAsync().ContinueWith( (Task<SignInResult> result) => 
+            xblUser.SignInAsync(null).ContinueWith( (Task<SignInResult> result) => 
             {
                 Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {

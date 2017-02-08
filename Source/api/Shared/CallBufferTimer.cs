@@ -12,7 +12,7 @@ namespace Microsoft.Xbox.Services.Shared
         public int NumObjects { get; private set; }
     }
 
-    class CallBufferReturnObject
+    class CallBufferReturnObject : global::System.EventArgs
     {
         private List<string> _userList;
         private CallBufferTimerCompletionContext _context;
@@ -86,13 +86,21 @@ namespace Microsoft.Xbox.Services.Shared
         {
             if(!this.isTaskInProgress)
             {
-                int timeDiff = (int)(this.bufferTimePerCallSec - (DateTime.Now - previousTime)).TotalMilliseconds;
-                int timeRemaining = Math.Max(0, timeDiff);
-                this.isTaskInProgress = true;
-                this.previousTime = DateTime.Now;
-
                 var userCopy = this.usersToCall.ToList();
                 var completionContext = this.callBufferTimerCompletionContext;
+                this.isTaskInProgress = true;
+
+#if WINDOWS_UWP
+                int timeDiff = (int)(this.bufferTimePerCallSec - (DateTime.Now - this.previousTime)).TotalMilliseconds;
+                int timeRemaining = Math.Max(0, timeDiff);
+#else
+                var timeRemaining = this.bufferTimePerCallSec - (DateTime.Now - previousTime);
+                if(timeRemaining.TotalMilliseconds < 0)
+                {
+                    timeRemaining = new TimeSpan();
+                }
+#endif
+                this.previousTime = DateTime.Now;
                 Task.Delay(timeRemaining).ContinueWith((continuationAction) =>
                 {
                     lock(usersToCall)

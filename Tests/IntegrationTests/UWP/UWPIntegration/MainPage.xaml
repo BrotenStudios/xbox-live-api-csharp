@@ -5,7 +5,7 @@
     xmlns:local="using:UWPIntegration"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+    mc:Ignorable="d" Width="783.754">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Button x:Name="button" Content="Sign In" HorizontalAlignment="Left" Margin="250,200,0,0" VerticalAlignment="Top" Click="button_Click"/>

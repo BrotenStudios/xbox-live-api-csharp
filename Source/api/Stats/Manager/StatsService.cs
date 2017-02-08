@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Text;
 using Newtonsoft.Json;
@@ -32,29 +33,20 @@ namespace Microsoft.Xbox.Services.Stats.Manager
             XboxLiveHttpRequest req = XboxLiveHttpRequest.Create(this.settings, "POST", endpoint, pathAndQuery);
             var svdModel = new Models.StatsValueDocumentModel()
             {
-                Version = statValuePostDocument.Version,
+                Revision = statValuePostDocument.Revision,
                 Timestamp = DateTime.Now,
-                Envelope = new Models.Envelope()
-                {
-                    ClientId = statValuePostDocument.ClientId,
-                    ClientVersion = statValuePostDocument.ClientVersion,
-                    ServerVersion = statValuePostDocument.ServerVersion
-                },
                 Stats = new Models.Stats()
                 {
-                    Title = new Dictionary<string, Models.Stat>(),
-                    Tags = new object()
+                    Title = new Dictionary<string, Models.Stat>()
                 }
             };
 
-            foreach(var stat in statValuePostDocument.Stats)
-            {
-                svdModel.Stats.Title.Add(stat.Key, new Models.Stat()
+            svdModel.Stats.Title = statValuePostDocument.Stats.ToDictionary(
+                stat => stat.Key,
+                stat => new Models.Stat()
                 {
-                    GlobalValue = stat.Value.Value,
-                    Operation = "replace"
+                    Value = stat.Value.Value
                 });
-            }
 
             req.RequestBody = JsonConvert.SerializeObject(svdModel, new JsonSerializerSettings
             {
@@ -66,7 +58,7 @@ namespace Microsoft.Xbox.Services.Stats.Manager
                 XboxLiveHttpResponse response = task.Result;
                 if(response.ErrorCode == 0)
                 {
-                    ++statValuePostDocument.ClientVersion;
+                    ++statValuePostDocument.Revision;
                 }
             });
         }
@@ -87,10 +79,7 @@ namespace Microsoft.Xbox.Services.Stats.Manager
                 var svdModel = JsonConvert.DeserializeObject<Models.StatsValueDocumentModel>(response.ResponseBodyJson);
                 var svd = new StatsValueDocument(svdModel.Stats.Title)
                 {
-                    ClientId = svdModel.Envelope.ClientId,
-                    ClientVersion = svdModel.Envelope.ClientVersion + 1,
-                    ServerVersion = svdModel.Envelope.ServerVersion,
-                    Version = svdModel.Version
+                    Revision = svdModel.Revision
                 };
                 return svd;
             });
