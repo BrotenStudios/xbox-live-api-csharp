@@ -5,7 +5,7 @@
 //  </copyright>
 // -----------------------------------------------------------------------
 
-namespace Microsoft.Xbox.Services.System
+namespace Microsoft.Xbox.Services
 {
     using global::System;
 

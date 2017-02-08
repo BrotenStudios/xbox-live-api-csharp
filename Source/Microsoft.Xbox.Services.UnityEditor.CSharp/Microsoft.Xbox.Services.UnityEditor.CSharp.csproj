@@ -65,7 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="System\XboxLiveUser.cs" />
+    <Compile Include="XboxLiveUser.cs" />
     <Compile Include="XboxLiveContext.cs" />
   </ItemGroup>
   <Import Project="$(BuildRoot)\Source\api\Microsoft.Xbox.Services.Shared.projitems" Label="Shared" />

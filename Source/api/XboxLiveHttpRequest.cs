@@ -76,7 +76,7 @@ namespace Microsoft.Xbox.Services
 
         public string RequestBody { get; set; }
 
-        public Task<XboxLiveHttpResponse> GetResponseWithAuth(System.XboxLiveUser user, HttpCallResponseBodyType httpCallResponseBodyType)
+        public Task<XboxLiveHttpResponse> GetResponseWithAuth(XboxLiveUser user, HttpCallResponseBodyType httpCallResponseBodyType)
         {
             TaskCompletionSource<XboxLiveHttpResponse> getResponseCompletionSource = new TaskCompletionSource<XboxLiveHttpResponse>();
 

@@ -87,7 +87,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="System\XboxLiveUser.cs" />
+    <Compile Include="XboxLiveUser.cs" />
     <Compile Include="XboxLiveContext.cs" />
     <EmbeddedResource Include="Properties\Microsoft.Xbox.Services._140.UWP.CSharp.rd.xml" />
   </ItemGroup>

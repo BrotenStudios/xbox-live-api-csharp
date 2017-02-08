@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Microsoft.Xbox.Services.System
+namespace Microsoft.Xbox.Services
 {
     using global::System.Text;
     using Windows.Foundation;

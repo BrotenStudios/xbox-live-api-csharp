@@ -66,12 +66,12 @@ namespace Microsoft.Xbox.Services.Multiplayer.Manager
             throw new NotImplementedException();
         }
 
-        public void JoinLobby(global::System.Object eventArgs, Microsoft.Xbox.Services.System.XboxLiveUser user)
+        public void JoinLobby(global::System.Object eventArgs, Microsoft.Xbox.Services.XboxLiveUser user)
         {
             throw new NotImplementedException();
         }
 
-        public void JoinLobby(string handleId, Microsoft.Xbox.Services.System.XboxLiveUser user)
+        public void JoinLobby(string handleId, Microsoft.Xbox.Services.XboxLiveUser user)
         {
             throw new NotImplementedException();
         }

@@ -50,10 +50,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)GameServerPlatform\GameServerTicketStatus.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameServerPlatform\GameVariant.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameServerPlatform\QualityOfServiceServer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GetTokenAndSignatureResult.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HttpCallRequestMessage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HttpCallResponseBodyType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HttpMethod.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HttpRequestMessageType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IXboxLiveUser.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Leaderboard\LeaderboardQuery.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Leaderboard\LeaderboardResponse.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Leaderboard\LeaderboardColumn.cs" />
@@ -161,9 +163,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)RealTimeActivity\RealTimeActivitySubscriptionState.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceCallLoggingConfig.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Shared\CallBufferTimer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SignInResult.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SignInStatus.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SignInUIEmphasisFeature.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SignInUIGameCategory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SignInUISettings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SignOutCompletedEventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Social\Manager\EventQueue.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Social\Manager\InternalEventQueue.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Social\Manager\InternalSocialEvent.cs" />
@@ -210,18 +215,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)Stats\Manager\StatsValueDocument.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Stats\Manager\StatValue.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\GamingPrivilege.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)System\GetTokenAndSignatureResult.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)System\IXboxLiveUser.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\JsonSerialization.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)System\SignInResult.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)System\SignInStatus.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)System\SignOutCompletedEventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\StringService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\TitleCallableUI.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\VerifyStringResult.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\VerifyStringResultCode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\XboxLiveServicesSettings.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)System\XboxLiveUser.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\XboxUserIdEqualityComparer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TitleStorage\TitleStorageBlobMetadata.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TitleStorage\TitleStorageBlobMetadataResult.cs" />
@@ -248,6 +247,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)XboxLiveHttpRequest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)XboxLiveHttpResponse.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)XboxLiveLogCallEventArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)XboxLiveUser.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)XboxServiceCallRoutedEventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)XboxServicesDiagnosticsTraceLevel.cs" />
   </ItemGroup>
