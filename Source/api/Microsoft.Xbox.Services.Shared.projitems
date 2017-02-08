@@ -56,6 +56,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)HttpMethod.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HttpRequestMessageType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IXboxLiveUser.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Leaderboard\ILeaderboardService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Leaderboard\MockLeaderboardService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Leaderboard\SortOrder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Leaderboard\LeaderboardQuery.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Leaderboard\LeaderboardResponse.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Leaderboard\LeaderboardColumn.cs" />

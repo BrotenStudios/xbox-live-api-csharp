@@ -11,31 +11,9 @@ namespace Microsoft.Xbox.Services.Leaderboard
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
-    public class LeaderboardQuery
+    public enum SortOrder
     {
-
-        public bool SkipResultToMe
-        {
-            get;
-            set;
-        }
-
-        public uint SkipResultsToRank
-        {
-            get;
-            set;
-        }
-
-        public uint MaxItems
-        {
-            get;
-            set;
-        }
-        public SortOrder Order
-        {
-            get;
-            set;
-        }
-
+        Ascending,
+        Descending,
     }
 }

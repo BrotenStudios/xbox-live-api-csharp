@@ -43,7 +43,7 @@ namespace Microsoft.Xbox.Services
             this.ContextualSearchService = new ContextualSearchService();
             this.EventsService = new EventsService();
             this.GameServerPlatformService = new GameServerPlatformService();
-            this.LeaderboardService = new LeaderboardService(user, Settings, AppConfig);
+            this.LeaderboardService = UseMockData ? (ILeaderboardService)new MockLeaderboardService(user, Settings, AppConfig) : new LeaderboardService(user, Settings, AppConfig);
             this.MatchmakingService = new MatchmakingService();
             this.MultiplayerService = new MultiplayerService();
             this.PresenceService = new PresenceService();
@@ -83,7 +83,7 @@ namespace Microsoft.Xbox.Services
 
         public UserStatisticsService UserStatisticsService { get; private set; }
 
-        public LeaderboardService LeaderboardService { get; private set; }
+        public ILeaderboardService LeaderboardService { get; private set; }
 
         public AchievementService AchievementService { get; private set; }
 

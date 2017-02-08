@@ -15,7 +15,7 @@ namespace Microsoft.Xbox.Services.Leaderboard
     using Social.Models;
     using System;
 
-    public class LeaderboardService
+    public class LeaderboardService : ILeaderboardService
     {
         private static readonly Uri leaderboardsBaseUri = new Uri("https://leaderboards.xboxlive.com");
         private readonly XboxLiveUser userContext;
