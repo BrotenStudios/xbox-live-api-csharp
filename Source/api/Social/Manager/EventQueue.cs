@@ -3,8 +3,6 @@ namespace Microsoft.Xbox.Services.Social.Manager
     using global::System;
     using global::System.Collections.Generic;
 
-    using Microsoft.Xbox.Services.System;
-
     internal class EventQueue : IEnumerable<SocialEvent>
     {
         private Queue<SocialEvent> events = new Queue<SocialEvent>();

@@ -7,13 +7,9 @@
 
 namespace Microsoft.Xbox.Services
 {
-    using global::System.IO;
-
-    using Newtonsoft.Json;
-
-    public class XboxLiveAppConfiguration
+    public partial class XboxLiveAppConfiguration
     {
-        private const string appConfigurationPath = "XboxServices.config";
+        public const string FileName = "XboxServices.config";
 
         private static XboxLiveAppConfiguration instance;
 
@@ -21,25 +17,8 @@ namespace Microsoft.Xbox.Services
         {
             get
             {
-                if (instance == null)
-                {
-                    //string configContent = File.ReadAllText(appConfigurationPath);
-                    string configContent = @"
-                    {
-                      ""ServiceConfigurationId"" : ""00000000-0000-0000-0000-0000694f5acb"",
-                      ""TitleId"": ""1766808267"",
-                      ""Environment"": """",
-                      ""Sandbox"": ""JDTDWX.0"",
-                    }";
-                    instance = JsonConvert.DeserializeObject<XboxLiveAppConfiguration>(configContent);
-                }
-
-                return instance;
+                return instance ?? (instance = Load());
             }
-        }
-
-        private XboxLiveAppConfiguration()
-        {
         }
 
         public SignInUISettings AppSignInUISettings { get; set; }
@@ -51,5 +30,14 @@ namespace Microsoft.Xbox.Services
         public string ServiceConfigurationId { get; set; }
 
         public uint TitleId { get; set; }
+
+        public string ProductFamilyName { get; set; }
+
+        public string AppId { get; set; }
+
+        public static XboxLiveAppConfiguration Load()
+        {
+            return Load(FileName);
+        }
     }
 }

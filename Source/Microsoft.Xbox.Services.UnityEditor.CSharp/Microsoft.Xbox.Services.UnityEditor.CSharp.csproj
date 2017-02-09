@@ -6,7 +6,6 @@
   </PropertyGroup>
   <Import Project="$(BuildRoot)\build\props\buildoutput.props" />
   <PropertyGroup>
-    <OutputPath>$(OutputPath)Plugins\</OutputPath>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
@@ -27,6 +26,7 @@
     <LangVersion Condition=" '$(VisualStudioVersion)' != '10.0' ">4</LangVersion>
     <FileAlignment>512</FileAlignment>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <OutputPath>$(OutputPath)Plugins\</OutputPath>
     <PluginLayoutPath>$(BasePluginLayoutPath)Plugins\</PluginLayoutPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -66,6 +66,7 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="XboxLiveUser.cs" />
+    <Compile Include="XboxLiveAppConfiguration.cs" />
     <Compile Include="XboxLiveContext.cs" />
   </ItemGroup>
   <Import Project="$(BuildRoot)\Source\api\Microsoft.Xbox.Services.Shared.projitems" Label="Shared" />
@@ -79,17 +80,14 @@
   </Target>
   <PropertyGroup>
     <PostBuildEvent>REM Copies libs into Unity folder if this is a git submodule of that project
-SET "pluginRoot=..\..\..\..\..\Assets\Xbox Live"
+SET "pluginRoot=$(SolutionDir)..\..\..\Assets\Xbox Live"
 IF NOT EXIST "%25pluginRoot%25" GOTO DONE
-set "dst=%25pluginRoot%25\Libs"
+set "dst=%25pluginRoot%25\Libs\Unity"
 IF NOT EXIST "%25dst%25" mkdir "%25dst%25"
 REM SET "src=..\..\Layout\$(ConfigurationName)\Plugins\"
 SET "src=$(TargetDir)"
-echo ==================================
-echo Copying from %25src%25 to %25dst%25
-echo ==================================
+echo Copying binaries from %25src%25 to Unity Plugin path %25dst%25
 copy "%25src%25" "%25dst%25"
-:DONE
-</PostBuildEvent>
+:DONE</PostBuildEvent>
   </PropertyGroup>
 </Project>

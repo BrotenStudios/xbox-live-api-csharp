@@ -37,7 +37,11 @@ namespace Microsoft.Xbox.Services
             this.webRequest.Method = method;
 
             this.SetCustomHeader("Accept-Language", CultureInfo.CurrentUICulture + "," + CultureInfo.CurrentUICulture.TwoLetterISOLanguageName);
+#if WINDOWS_UWP
             this.SetCustomHeader("Accept", "*/*");
+#else
+            this.webRequest.Accept = "*/*";
+#endif
             this.SetCustomHeader("Cache-Control", "no-cache");
             this.ContentType = "application/json; charset=utf-8";
 
@@ -90,21 +94,28 @@ namespace Microsoft.Xbox.Services
                     }
 
                     var result = tokenTask.Result;
-#if	!WINDOWS_UWP
+#if !WINDOWS_UWP
                     this.SetCustomHeader(AuthorizationHeaderName, string.Format("XBL3.0 x={0};{1}", result.XboxUserHash, result.Token));
 #else
                     this.SetCustomHeader(AuthorizationHeaderName, string.Format("{0}", result.Token));               
 #endif
                     this.SetCustomHeader(SignatureHeaderName, tokenTask.Result.Signature);
-                    this.GetResponseWithoutAuth(httpCallResponseBodyType).ContinueWith(getResponseTask =>
+                    try
                     {
-                        if (getResponseTask.IsFaulted)
+                        this.GetResponseWithoutAuth(httpCallResponseBodyType).ContinueWith(getResponseTask =>
                         {
-                            getResponseCompletionSource.SetException(getResponseTask.Exception);
-                        }
+                            if (getResponseTask.IsFaulted)
+                            {
+                                getResponseCompletionSource.SetException(getResponseTask.Exception);
+                            }
 
-                        getResponseCompletionSource.SetResult(getResponseTask.Result);
-                    });
+                            getResponseCompletionSource.SetResult(getResponseTask.Result);
+                        });
+                    }
+                    catch (Exception e)
+                    {
+                        getResponseCompletionSource.SetException(e);
+                    }
                 });
 
             return getResponseCompletionSource.Task;

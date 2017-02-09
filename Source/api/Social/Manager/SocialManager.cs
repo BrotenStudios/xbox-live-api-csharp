@@ -125,12 +125,12 @@ namespace Microsoft.Xbox.Services.Social.Manager
             }
 
             XboxSocialUserGroup group = new XboxSocialUserGroup(user, presenceFilter, relationshipFilter, userGraph.TitleId);
-            this.AddUserGroup(user, group);
-
             if (userGraph.IsInitialized)
             {
-                group.InitializeFilterList(userGraph.ActiveUsers);
+                group.InitializeGroup(userGraph.ActiveUsers);
             }
+
+            this.AddUserGroup(user, group);
 
             return group;
         }
@@ -147,6 +147,11 @@ namespace Microsoft.Xbox.Services.Social.Manager
             }
 
             XboxSocialUserGroup group = new XboxSocialUserGroup(user, userIds);
+            if (userGraph.IsInitialized)
+            {
+                group.InitializeGroup(userGraph.ActiveUsers);
+            }
+
             this.AddUserGroup(user, group);
 
             userGraph.AddUsers(userIds).ContinueWith(addUsersTask =>

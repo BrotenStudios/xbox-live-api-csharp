@@ -12,7 +12,6 @@ namespace Microsoft.Xbox.Services.Social.Manager
     using global::System.Linq;
 
     using Microsoft.Xbox.Services.Presence;
-    using Microsoft.Xbox.Services.System;
 
     public class XboxSocialUserGroup : IEnumerable<XboxSocialUser>
     {
@@ -21,14 +20,10 @@ namespace Microsoft.Xbox.Services.Social.Manager
         private readonly HashSet<ulong> userIds;
         private readonly HashSet<XboxSocialUser> users = new HashSet<XboxSocialUser>(new XboxSocialUserIdEqualityComparer());
 
-        private ISocialManager socialManager;
-        private bool disposed;
-
         /// <summary>
         /// Initialize an <see cref="XboxSocialUserGroup" />
         /// </summary>
-        /// <param name="socialManager">The social manager that owns this group.</param>
-        /// <param name="localUser">The user that this group belongs to<./param>
+        /// <param name="localUser">The user that this group belongs to.</param>
         /// <param name="type">The type of SocialManager group.</param>
         private XboxSocialUserGroup(XboxLiveUser localUser, SocialUserGroupType type)
         {
@@ -36,6 +31,11 @@ namespace Microsoft.Xbox.Services.Social.Manager
             this.SocialUserGroupType = type;
         }
 
+        /// <summary>
+        /// Creates a list based XboxSocialUserGroup from a given set of user ids.
+        /// </summary>
+        /// <param name="localUser">The user who the group belongs to.</param>
+        /// <param name="userIds">The list of users to include in the group.</param>
         internal XboxSocialUserGroup(XboxLiveUser localUser, ICollection<ulong> userIds)
             : this(localUser, SocialUserGroupType.UserListType)
         {
@@ -46,6 +46,13 @@ namespace Microsoft.Xbox.Services.Social.Manager
             this.userIds = new HashSet<ulong>(userIds);
         }
 
+        /// <summary>
+        /// Creates a filter based XboxSocialUserGroup from a given set of filter parameters.
+        /// </summary>
+        /// <param name="localUser">The user who the group belongs to.</param>
+        /// <param name="presenceFilter">Indicates the presence of users who should be included in the group.</param>
+        /// <param name="relationshipFilter">Indicates the relationship to the local user of users who should be included in the group.</param>
+        /// <param name="titleId">The title id to filter users to.</param>
         internal XboxSocialUserGroup(XboxLiveUser localUser, PresenceFilter presenceFilter, RelationshipFilter relationshipFilter, uint titleId)
             : this(localUser, SocialUserGroupType.FilterType)
         {
@@ -129,15 +136,30 @@ namespace Microsoft.Xbox.Services.Social.Manager
             }
         }
 
-        internal void InitializeFilterList(IEnumerable<XboxSocialUser> users)
+        internal void InitializeGroup(IEnumerable<XboxSocialUser> users)
         {
-            foreach (XboxSocialUser user in users)
+            switch (this.SocialUserGroupType)
             {
-                if (!this.CheckRelationshipFilter(user, this.RelationshipFilter)) continue;
-                if (this.CheckPresenceFilter(user, this.PresenceFilter))
-                {
-                    this.AddUser(user);
-                }
+                case SocialUserGroupType.FilterType:
+                    foreach (XboxSocialUser user in users)
+                    {
+
+                        if (!this.CheckRelationshipFilter(user, this.RelationshipFilter)) continue;
+                        if (this.CheckPresenceFilter(user, this.PresenceFilter))
+                        {
+                            this.AddUser(user);
+                        }
+                    }
+                    break;
+                case SocialUserGroupType.UserListType:
+                    foreach (XboxSocialUser user in users)
+                    {
+                        if (this.userIds.Contains(user.XboxUserId))
+                        {
+                            this.AddUser(user);
+                        }
+                    }
+                    break;
             }
         }
 

@@ -326,7 +326,6 @@ namespace Microsoft.Xbox.Services.Social.Manager
 
         private void PerformDiff(List<XboxSocialUser> xboxSocialUsers)
         {
-            this.refreshLock.EnterWriteLock();
             try
             {
                 this.socialGraphState = SocialGraphState.Diff;
@@ -400,7 +399,6 @@ namespace Microsoft.Xbox.Services.Social.Manager
             finally
             {
                 this.socialGraphState = SocialGraphState.Normal;
-                this.refreshLock.ExitWriteLock();
             }
         }
 

@@ -1,71 +1,71 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Text;
-using System.Linq;
+﻿// -----------------------------------------------------------------------
+//  <copyright file="CallBufferTimer.cs" company="Microsoft">
+//      Copyright (c) Microsoft. All rights reserved.
+//      Licensed under the MIT license. See LICENSE file in the project root for full license information.
+//  </copyright>
+// -----------------------------------------------------------------------
 
 namespace Microsoft.Xbox.Services.Shared
 {
-    class CallBufferTimerCompletionContext
+    using global::System;
+    using global::System.Collections.Generic;
+    using global::System.Linq;
+    using global::System.Threading.Tasks;
+
+    internal class CallBufferTimerCompletionContext
     {
         public int Context { get; private set; }
         public int NumObjects { get; private set; }
     }
 
-    class CallBufferReturnObject : global::System.EventArgs
+    internal class CallBufferReturnObject : EventArgs
     {
-        private List<string> _userList;
-        private CallBufferTimerCompletionContext _context;
-        public List<string> UserList { get { return _userList; } }
-        public CallBufferTimerCompletionContext CompletionContext { get { return _context; } }
+        public List<string> UserList { get; private set; }
+        public CallBufferTimerCompletionContext CompletionContext { get; private set; }
 
         public CallBufferReturnObject(List<string> userList, CallBufferTimerCompletionContext context)
         {
-            _userList = userList;
-            _context = context;
+            this.UserList = userList;
+            this.CompletionContext = context;
         }
     }
 
     internal class CallBufferTimer
     {
+        private readonly TimeSpan bufferTimePerCallSec;
+        private readonly List<string> usersToCall = new List<string>();
+        private readonly Dictionary<string, bool> usersToCallMap = new Dictionary<string, bool>();
+
         private bool isTaskInProgress;
         private bool isQueuedTask;
-        private readonly TimeSpan bufferTimePerCallSec;
         private DateTime previousTime;
-        private List<string> usersToCall;
-        private Dictionary<string, bool> usersToCallMap;
         private CallBufferTimerCompletionContext callBufferTimerCompletionContext;
 
         public event EventHandler<CallBufferReturnObject> TimerCompleteEvent;
+
         public CallBufferTimer(TimeSpan bufferTimePerCallSec)
         {
-            this.isTaskInProgress = false;
-            this.isQueuedTask = false;
             this.bufferTimePerCallSec = bufferTimePerCallSec;
-            this.previousTime = new DateTime(0);
-            this.usersToCall = new List<string>();
-            this.usersToCallMap = new Dictionary<string, bool>();
-            this.callBufferTimerCompletionContext = null;
         }
 
         public void Fire()
         {
-            FireHelper();
+            this.FireHelper();
         }
 
         public void Fire(List<string> xboxUserIds, CallBufferTimerCompletionContext completionContext = null)
         {
-            if(xboxUserIds == null)
+            if (xboxUserIds == null)
             {
                 throw new ArgumentNullException("xboxUserIds");
             }
 
-            lock(this.usersToCall)
+            lock (this.usersToCall)
             {
                 this.callBufferTimerCompletionContext = completionContext;
                 foreach (string xuid in xboxUserIds)
                 {
-                    if(!usersToCallMap.ContainsKey(xuid))
+                    if (!this.usersToCallMap.ContainsKey(xuid))
                     {
                         this.usersToCall.Add(xuid);
                         this.usersToCallMap[xuid] = true;
@@ -74,9 +74,9 @@ namespace Microsoft.Xbox.Services.Shared
 
                 Task.Run(() =>
                 {
-                    lock(this.usersToCall)
+                    lock (this.usersToCall)
                     {
-                        FireHelper();
+                        this.FireHelper();
                     }
                 });
             }
@@ -84,46 +84,40 @@ namespace Microsoft.Xbox.Services.Shared
 
         private void FireHelper()
         {
-            if(!this.isTaskInProgress)
+            if (!this.isTaskInProgress)
             {
+                TimeSpan timeDiff = (this.bufferTimePerCallSec - (DateTime.Now - this.previousTime));
+                if (timeDiff.TotalMilliseconds < 0)
+                {
+                    timeDiff = TimeSpan.Zero;
+                }
+                this.isTaskInProgress = true;
+                this.previousTime = DateTime.Now;
+
                 var userCopy = this.usersToCall.ToList();
                 var completionContext = this.callBufferTimerCompletionContext;
-                this.isTaskInProgress = true;
-
-#if WINDOWS_UWP
-                int timeDiff = (int)(this.bufferTimePerCallSec - (DateTime.Now - this.previousTime)).TotalMilliseconds;
-                int timeRemaining = Math.Max(0, timeDiff);
-#else
-                var timeRemaining = this.bufferTimePerCallSec - (DateTime.Now - previousTime);
-                if(timeRemaining.TotalMilliseconds < 0)
+                Task.Delay(timeDiff).ContinueWith((continuationAction) =>
                 {
-                    timeRemaining = new TimeSpan();
-                }
-#endif
-                this.previousTime = DateTime.Now;
-                Task.Delay(timeRemaining).ContinueWith((continuationAction) =>
-                {
-                    lock(usersToCall)
+                    lock (this.usersToCall)
                     {
-                        isTaskInProgress = false;
-                        TimerCompleteEvent(this, new CallBufferReturnObject(userCopy, completionContext));
-                        if(isQueuedTask)
+                        this.isTaskInProgress = false;
+                        this.TimerCompleteEvent(this, new CallBufferReturnObject(userCopy, completionContext));
+                        if (this.isQueuedTask)
                         {
-                            isQueuedTask = false;
-                            FireHelper();
+                            this.isQueuedTask = false;
+                            this.FireHelper();
                         }
                     }
                 });
-                
-                usersToCall.Clear();
-                usersToCallMap.Clear();
-                callBufferTimerCompletionContext = null;
+
+                this.usersToCall.Clear();
+                this.usersToCallMap.Clear();
+                this.callBufferTimerCompletionContext = null;
             }
             else
             {
-                isQueuedTask = true;
+                this.isQueuedTask = true;
             }
         }
-
     }
 }

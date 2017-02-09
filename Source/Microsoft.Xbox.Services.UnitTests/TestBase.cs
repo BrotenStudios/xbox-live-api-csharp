@@ -30,10 +30,7 @@ namespace Microsoft.Xbox.Services.UnitTests
 #pragma warning restore CS0675 // Bitwise-or operator used on a sign-extended operand
             string gamertag = "Gamer " + xuid;
 
-            xuid = "2533274795524562";
-            gamertag = "Veleek";
-
-            this.user = new XboxLiveUser(xuid, gamertag);
+            this.user = new XboxLiveUser();
             this.context = new XboxLiveContext(this.user);
         }
     }
