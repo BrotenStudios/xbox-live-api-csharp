@@ -37,16 +37,23 @@ namespace Microsoft.Xbox.Services
             get;
         }
 
+#if WINDOWS_UWP
+        Task<SignInResult> SignInAsync(Windows.UI.Core.CoreDispatcher coreDispatcher);
+
+        Task<SignInResult> SignInSilentlyAsync(Windows.UI.Core.CoreDispatcher coreDispatcher);
+
+        Task<SignInResult> SwitchAccountAsync(Windows.UI.Core.CoreDispatcher coreDispatcher);
+#else
         Task<SignInResult> SignInAsync();
 
         Task<SignInResult> SignInSilentlyAsync();
-
+#endif
         Task<SignInResult> SwitchAccountAsync();
 
-        Task<GetTokenAndSignatureResult> GetTokenAndSignatureAsync(string httpMethod, string url, string headers);
+        Task<TokenAndSignatureResult> GetTokenAndSignatureAsync(string httpMethod, string url, string headers);
 
-        Task<GetTokenAndSignatureResult> GetTokenAndSignatureAsync(string httpMethod, string url, string headers, string body);
+        Task<TokenAndSignatureResult> GetTokenAndSignatureAsync(string httpMethod, string url, string headers, string body);
 
-        Task<GetTokenAndSignatureResult> GetTokenAndSignatureAsync(string httpMethod, string url, string headers, byte[] body);
+        Task<TokenAndSignatureResult> GetTokenAndSignatureArrayAsync(string httpMethod, string url, string headers, byte[] body);
     }
 }

@@ -12,25 +12,34 @@ namespace Microsoft.Xbox.Services
 
     public class SignInUISettings
     {
+
         public SignInUISettings()
         {
             this.EmphasisFeatures = new List<SignInUIEmphasisFeature>();
         }
 
-        public string BackgroundHexColor { get; set; }
+        public string BackgroundHexColor { get; set; } 
 
         public IList<SignInUIEmphasisFeature> EmphasisFeatures { get; private set; }
 
         public SignInUIGameCategory TitleCategory { get; set; }
+        internal string BackgroundImage { get; private set; }
 
         public void AddEmphasisFeature(SignInUIEmphasisFeature feature)
         {
             this.EmphasisFeatures.Add(feature);
+            TitleCategory = SignInUIGameCategory.Standard;
         }
 
         public void SetBackgroundImage(byte[] image)
         {
             throw new NotImplementedException();
+        }
+
+        internal bool Enabled()
+        {
+            return (BackgroundHexColor != null && BackgroundHexColor.Length != 0) || (BackgroundImage != null && BackgroundImage.Length != 0) || EmphasisFeatures.Count > 0 ||
+                   TitleCategory != SignInUIGameCategory.Standard;
         }
     }
 }

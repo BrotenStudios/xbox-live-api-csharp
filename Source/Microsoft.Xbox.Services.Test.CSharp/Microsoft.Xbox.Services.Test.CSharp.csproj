@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="Friends.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="System\UserImpl.cs" />
     <Compile Include="XboxLiveUser.cs" />
     <Compile Include="XboxLiveAppConfiguration.cs" />
     <Compile Include="XboxLiveContext.cs" />

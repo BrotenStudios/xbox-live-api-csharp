@@ -11,10 +11,50 @@ namespace Microsoft.Xbox.Services
 
     public class XboxLiveContextSettings
     {
+#if WINDOWS_UWP
+        private static Windows.UI.Core.CoreDispatcher s_coreDispatcher;
+#endif
+
         public XboxLiveContextSettings()
         {
             this.DiagnosticsTraceLevel = XboxServicesDiagnosticsTraceLevel.Off;
         }
+
+#if WINDOWS_UWP
+        public static Windows.UI.Core.CoreDispatcher Dispatcher
+        {
+            get { return s_coreDispatcher; }
+            internal set
+            {
+                if(s_coreDispatcher != null)
+                {
+                    s_coreDispatcher = value;
+                }
+                else
+                {
+                    try
+                    {
+                        var currentView = Windows.ApplicationModel.Core.CoreApplication.GetCurrentView();
+                        if(currentView != null && currentView.CoreWindow != null)
+                        {
+                            s_coreDispatcher = currentView.CoreWindow.Dispatcher;
+                        }
+                    }
+                    catch(Exception)
+                    {
+                    }
+                }
+
+                if(s_coreDispatcher != null)
+                {
+                    s_coreDispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, new Windows.UI.Core.DispatchedHandler(() =>
+                    {
+                        // todo: generate locales
+                    }));
+                }
+            }
+        }
+#endif
 
         public bool UseCoreDispatcherForEventRouting { get; set; }
 

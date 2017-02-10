@@ -10,16 +10,24 @@ namespace Microsoft.Xbox.Services
     using global::System;
     using global::System.Text;
     using global::System.Threading.Tasks;
+    using Microsoft.Xbox.Services.System;
 
     public partial class XboxLiveUser
     {
+        private UserImpl mockUserImpl;
+        public XboxLiveUser()
+        {
+            userImpl = new UserImpl();
+            mockUserImpl = (UserImpl)userImpl;
+        }
+
         public Task<SignInResult> SignInAsync()
         {
             if (XboxLiveContext.UseMockData)
             {
-                this.IsSignedIn = true;
-                this.Gamertag = "2 dev 7727";
-                this.XboxUserId = "123456789";
+                this.mockUserImpl.IsSignedIn = true;
+                this.mockUserImpl.Gamertag = "2 dev 7727";
+                this.mockUserImpl.XboxUserId = "123456789";
                 return Task.FromResult(new SignInResult(SignInStatus.Success));
             }
 
@@ -30,9 +38,9 @@ namespace Microsoft.Xbox.Services
         {
             if (XboxLiveContext.UseMockData)
             {
-                this.IsSignedIn = true;
-                this.Gamertag = "2 dev 7727";
-                this.XboxUserId = "123456789";
+                this.mockUserImpl.IsSignedIn = true;
+                this.mockUserImpl.Gamertag = "2 dev 7727";
+                this.mockUserImpl.XboxUserId = "123456789";
                 return Task.FromResult(new SignInResult(SignInStatus.Success));
             }
 
@@ -43,32 +51,32 @@ namespace Microsoft.Xbox.Services
         {
             if (XboxLiveContext.UseMockData)
             {
-                this.IsSignedIn = true;
-                this.Gamertag = "2 dev 7727";
-                this.XboxUserId = "123456789";
+                this.mockUserImpl.IsSignedIn = true;
+                this.mockUserImpl.Gamertag = "2 dev 7727";
+                this.mockUserImpl.XboxUserId = "123456789";
                 return Task.FromResult(new SignInResult(SignInStatus.Success));
             }
 
             throw new NotImplementedException();
         }
 
-        public Task<GetTokenAndSignatureResult> GetTokenAndSignatureAsync(string httpMethod, string url, string headers)
+        public Task<TokenAndSignatureResult> GetTokenAndSignatureAsync(string httpMethod, string url, string headers)
         {
             return this.GetTokenAndSignatureAsync(httpMethod, url, headers, string.Empty);
         }
 
-        public Task<GetTokenAndSignatureResult> GetTokenAndSignatureAsync(string httpMethod, string url, string headers, byte[] body)
+        public Task<TokenAndSignatureResult> GetTokenAndSignatureArrayAsync(string httpMethod, string url, string headers, byte[] body)
         {
             string bodyString = Encoding.UTF8.GetString(body);
 
             return this.GetTokenAndSignatureAsync(httpMethod, url, headers, bodyString);
         }
 
-        public Task<GetTokenAndSignatureResult> GetTokenAndSignatureAsync(string httpMethod, string url, string headers, string body)
+        public Task<TokenAndSignatureResult> GetTokenAndSignatureAsync(string httpMethod, string url, string headers, string body)
         {
             if (XboxLiveContext.UseMockData)
             {
-                return Task.FromResult(new GetTokenAndSignatureResult
+                return Task.FromResult(new TokenAndSignatureResult
                 {
                     Gamertag = this.Gamertag,
                     XboxUserId = this.XboxUserId,

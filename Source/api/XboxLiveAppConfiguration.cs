@@ -21,12 +21,19 @@ namespace Microsoft.Xbox.Services
             }
         }
 
+        private XboxLiveAppConfiguration()
+        {
+            AppSignInUISettings = new SignInUISettings();
+        }
+      
         public SignInUISettings AppSignInUISettings { get; set; }
 
         public string Sandbox { get; set; }
 
         public string Environment { get; set; }
 
+        internal string EnvironmentPrefix { get; set; }
+        internal bool UseFirstPartyToken { get; set; }
         public string ServiceConfigurationId { get; set; }
 
         public uint TitleId { get; set; }

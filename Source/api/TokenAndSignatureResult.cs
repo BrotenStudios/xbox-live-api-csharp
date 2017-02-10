@@ -2,10 +2,13 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+#if WINDOWS_UWP
+using Windows.Security.Authentication.Web.Core;
+#endif
 
 namespace Microsoft.Xbox.Services
 {
-    public class GetTokenAndSignatureResult
+    public class TokenAndSignatureResult
     {
 
         public string WebAccountId
@@ -61,5 +64,12 @@ namespace Microsoft.Xbox.Services
             get;
             set;
         }
+#if WINDOWS_UWP
+        internal WebTokenRequestResult TokenRequestResult
+        {
+            get;
+            set;
+        }
+#endif
     }
 }

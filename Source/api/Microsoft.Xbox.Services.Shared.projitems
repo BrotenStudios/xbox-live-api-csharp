@@ -50,7 +50,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)GameServerPlatform\GameServerTicketStatus.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameServerPlatform\GameVariant.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameServerPlatform\QualityOfServiceServer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GetTokenAndSignatureResult.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\IXboxWebsocketClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SignInCompletedEventArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\AuthConfig.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\IUserImpl.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TokenAndSignatureResult.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HttpCallRequestMessage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HttpCallResponseBodyType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HttpMethod.cs" />
@@ -226,6 +230,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)System\VerifyStringResult.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\VerifyStringResultCode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\XboxLiveServicesSettings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\XboxSystemFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\XboxUserIdEqualityComparer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TitleStorage\TitleStorageBlobMetadata.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TitleStorage\TitleStorageBlobMetadataResult.cs" />

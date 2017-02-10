@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Microsoft.Xbox.Services.Stats.Manager;
 using Microsoft.Xbox.Services;
 using Microsoft.Xbox.Services.Leaderboard;
+using Microsoft.Xbox.Services.Shared;
 
 #pragma warning disable 4014
 
@@ -69,6 +70,7 @@ namespace UWPIntegration
                 XboxLiveContext services = new XboxLiveContext(xblUser);
                 try
                 {
+                    services.ProfileService.GetUserProfileAsync(xblUser.XboxUserId).Wait();
                     services.LeaderboardService.GetLeaderboardAsync("MostEnemysDefeated", new LeaderboardQuery()).ContinueWith((Task<LeaderboardResult> lbResult) =>
                     {
                         Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
@@ -85,6 +87,30 @@ namespace UWPIntegration
                 catch (Exception)
                 {
                 }
+            }
+        }
+        XboxWebSocketConnection webSocketConnection;
+        private void websocketButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.xblUser.IsSignedIn)
+            {
+                webSocketConnection = new XboxWebSocketConnection(this.xblUser, new Uri("wss://rta.xboxlive.com"), null, new XboxLiveServicesSettings());
+                webSocketConnection.EnsureConnected().ContinueWith((result) =>
+                {
+                    Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
+                        Windows.UI.Core.CoreDispatcherPriority.Normal,
+                        () =>
+                        {
+                            if (!result.IsFaulted)
+                            {
+                                leaderboardData.Text = "websocket connected";
+                            }
+                            else
+                            {
+                                leaderboardData.Text = "websocket not connected";
+                            }
+                        });
+                });
             }
         }
     }

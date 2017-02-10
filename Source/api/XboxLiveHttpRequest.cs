@@ -67,11 +67,20 @@ namespace Microsoft.Xbox.Services
             get
             {
                 StringBuilder sb = new StringBuilder();
+                bool isFirstVal = true;
                 foreach (var header in this.customHeaders)
                 {
-                    sb.AppendFormat("{0}={1};", header.Key, header.Value);
-                }
+                    if (isFirstVal)
+                    {
+                        isFirstVal = false;
+                    }
+                    else
+                    {
+                        sb.AppendLine();
+                    }
 
+                    sb.AppendFormat("{0}: {1}", header.Key, header.Value);
+                }
                 return sb.ToString();
             }
         }
