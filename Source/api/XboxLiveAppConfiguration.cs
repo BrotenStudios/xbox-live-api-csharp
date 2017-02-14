@@ -28,9 +28,17 @@ namespace Microsoft.Xbox.Services
       
         public SignInUISettings AppSignInUISettings { get; set; }
 
-        public string Sandbox { get; set; }
+        public string PublisherId { get; set; }
 
-        public string Environment { get; set; }
+        public string PublisherDisplayName { get; set; }
+
+        public string PackageIdentityName { get; set; }
+
+        public string DisplayName { get; set; }
+
+        public string AppId { get; set; }
+
+        public string ProductFamilyName { get; set; }
 
         internal string EnvironmentPrefix { get; set; }
         internal bool UseFirstPartyToken { get; set; }
@@ -38,9 +46,9 @@ namespace Microsoft.Xbox.Services
 
         public uint TitleId { get; set; }
 
-        public string ProductFamilyName { get; set; }
+        public string Sandbox { get; set; }
 
-        public string AppId { get; set; }
+        public string Environment { get; set; }
 
         public static XboxLiveAppConfiguration Load()
         {

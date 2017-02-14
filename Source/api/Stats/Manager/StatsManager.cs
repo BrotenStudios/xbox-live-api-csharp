@@ -42,11 +42,9 @@ namespace Microsoft.Xbox.Services.Stats.Manager
         {
             get
             {
-                return instance ?? (instance = UseMockData ? new MockStatsManager() : (IStatsManager)new StatsManager());
+                return instance ?? (instance = XboxLiveContext.UseMockData ? new MockStatsManager() : (IStatsManager)new StatsManager());
             }
         }
-
-        public static bool UseMockData { get; set; }
 
         private StatsManager()
         {
@@ -177,7 +175,7 @@ namespace Microsoft.Xbox.Services.Stats.Manager
             this.userStatContextMap[user.XboxUserId].statsValueDocument.SetStat(statName, value);
         }
 
-        public void SetStatAsInteger(XboxLiveUser user, string statName, Int64 value)
+        public void SetStatAsInteger(XboxLiveUser user, string statName, long value)
         {
             this.CheckUserValid(user);
 

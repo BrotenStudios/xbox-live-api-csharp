@@ -19,6 +19,11 @@ namespace Microsoft.Xbox.Services
 
         public static void Load(string path)
         {
+            if (!File.Exists(path))
+            {
+                return;
+            }
+
             string rawData = File.ReadAllText(path);
             List<MockRequestData> pairs = JsonConvert.DeserializeObject<List<MockRequestData>>(rawData);
 

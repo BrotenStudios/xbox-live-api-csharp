@@ -7,8 +7,11 @@
 
 namespace Microsoft.Xbox.Services.Social.Manager
 {
+    using Windows.UI.ViewManagement;
+
     using global::System;
     using global::System.Collections.Generic;
+    using global::System.Diagnostics;
     using global::System.Linq;
     using global::System.Threading;
     using global::System.Threading.Tasks;
@@ -461,6 +464,12 @@ namespace Microsoft.Xbox.Services.Social.Manager
         private void ApplyUsersAddedEvent(InternalSocialEvent socialEvent, bool isFreshEvent)
         {
             List<XboxSocialUser> usersAdded = new List<XboxSocialUser>();
+
+            if (socialEvent.UsersAffected == null)
+            {
+                Debug.WriteLine("Unable to apply UsersAdded event because we only have userIds.");
+                return;
+            }
 
             foreach (XboxSocialUser socialUser in socialEvent.UsersAffected)
             {
