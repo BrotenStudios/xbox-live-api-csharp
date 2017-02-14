@@ -7,8 +7,6 @@
 
 namespace Microsoft.Xbox.Services.Social.Manager
 {
-    using Windows.UI.ViewManagement;
-
     using global::System;
     using global::System.Collections.Generic;
     using global::System.Diagnostics;
