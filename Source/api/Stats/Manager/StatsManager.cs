@@ -42,7 +42,7 @@ namespace Microsoft.Xbox.Services.Stats.Manager
         {
             get
             {
-                return instance ?? (instance = XboxLiveContext.UseMockData ? new MockStatsManager() : (IStatsManager)new StatsManager());
+                return instance ?? (instance = XboxLiveContext.UseMockServices ? new MockStatsManager() : (IStatsManager)new StatsManager());
             }
         }
 

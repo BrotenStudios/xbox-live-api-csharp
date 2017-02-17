@@ -11,6 +11,8 @@ using Windows.System.Threading;
 
 namespace Microsoft.Xbox.Services.System
 {
+    using Windows.UI.Core;
+
     internal class UserImpl : IUserImpl
     {
         private static bool? isSupported = null;
@@ -91,13 +93,28 @@ namespace Microsoft.Xbox.Services.System
             }
 
             TaskCompletionSource<object> taskCompletion = new TaskCompletionSource<object>();
+
+            if (!XboxLiveContextSettings.Dispatcher.HasThreadAccess)
+            {
+                // We're not on the UI thread, so we'll use the dispatcher to make our call.
+                IAsyncAction uiTask = XboxLiveContextSettings.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.InitializeProvider(taskCompletion));
+            }
+            else
+            {
+                // Otherwise just go ahead and make the call on this thread.
+                this.InitializeProvider(taskCompletion);
+            }
+
+            return taskCompletion.Task;
+        }
+
+        private void InitializeProvider(TaskCompletionSource<object> completionSource)
+        {
             IAsyncOperation<WebAccountProvider> providerTask = WebAuthenticationCoreManager.FindAccountProviderAsync("https://xsts.auth.xboxlive.com");
             providerTask.Completed = (webaccountProviderResult, state) =>
             {
-                FindAccountCompleted(webaccountProviderResult, state, taskCompletion);
+                FindAccountCompleted(webaccountProviderResult, state, completionSource);
             };
-
-            return taskCompletion.Task;
         }
 
         private void FindAccountCompleted(IAsyncOperation<WebAccountProvider> asyncInfo, AsyncStatus asyncStatus, TaskCompletionSource<object> completionSource)

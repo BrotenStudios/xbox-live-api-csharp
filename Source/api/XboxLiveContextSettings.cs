@@ -12,7 +12,7 @@ namespace Microsoft.Xbox.Services
     public class XboxLiveContextSettings
     {
 #if WINDOWS_UWP
-        private static Windows.UI.Core.CoreDispatcher s_coreDispatcher;
+        private static Windows.UI.Core.CoreDispatcher dispatcher;
 #endif
 
         public XboxLiveContextSettings()
@@ -23,31 +23,31 @@ namespace Microsoft.Xbox.Services
 #if WINDOWS_UWP
         public static Windows.UI.Core.CoreDispatcher Dispatcher
         {
-            get { return s_coreDispatcher; }
+            get
+            {
+                return dispatcher;
+            }
+
             internal set
             {
-                if(s_coreDispatcher != null)
+                if (dispatcher != null)
                 {
-                    s_coreDispatcher = value;
+                    dispatcher = value;
                 }
                 else
                 {
                     try
                     {
-                        var currentView = Windows.ApplicationModel.Core.CoreApplication.GetCurrentView();
-                        if(currentView != null && currentView.CoreWindow != null)
-                        {
-                            s_coreDispatcher = currentView.CoreWindow.Dispatcher;
-                        }
+                        dispatcher = Windows.ApplicationModel.Core.CoreApplication.MainView.Dispatcher;
                     }
-                    catch(Exception)
+                    catch (Exception)
                     {
                     }
                 }
 
-                if(s_coreDispatcher != null)
+                if (dispatcher != null)
                 {
-                    s_coreDispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, new Windows.UI.Core.DispatchedHandler(() =>
+                    dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, new Windows.UI.Core.DispatchedHandler(() =>
                     {
                         // todo: generate locales
                     }));

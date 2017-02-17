@@ -20,7 +20,7 @@
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <PluginLayoutPath>$(BasePluginLayoutPath)Plugins\WSA\</PluginLayoutPath>
+    <PluginLayoutPath>$(BasePluginLayoutPath)UWP\</PluginLayoutPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -99,22 +99,19 @@
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <Target Name="LayoutPlugin" AfterTargets="Build">
+    <Message Importance="high" Text="OutputPath: $(OutDir)" />
     <Message Importance="high" Text="Copying binaries to plugin layout path $(PluginLayoutPath)" />
     <MakeDir Directories="$(PluginLayoutPath)" />
-    <Exec Command="xcopy /y /d $(OutDir)*.pdb $(PluginLayoutPath)" />
     <Exec Command="xcopy /y /d $(OutDir)*.dll $(PluginLayoutPath)" />
+    <Exec Command="xcopy /y /d $(OutDir)*.pdb $(PluginLayoutPath)" Condition="'$(Configuration)' == 'Debug'" />
+    <Exec Command="xcopy /y /d $(ProjectDir)..\packages\Newtonsoft.Json.9.0.1\lib\portable-net45+wp80+win8+wpa81\Newtonsoft.Json.dll $(PluginLayoutPath)" />
   </Target>
-  <PropertyGroup>
-    <PostBuildEvent>REM Copies libs into Unity folder if this is a git submodule of that project
-SET "pluginRoot=$(SolutionDir)..\..\..\Assets\Xbox Live"
-IF NOT EXIST "%25pluginRoot%25" GOTO DONE
-set "dst=%25pluginRoot%25\Libs\UWP"
-IF NOT EXIST "%25dst%25" mkdir "%25dst%25"
-REM SET "src=..\..\Layout\$(ConfigurationName)\Plugins\"
-SET "src=$(TargetDir)"
-echo Copying binaries from %25src%25 to Unity Plugin path %25dst%25
-copy "%25src%25" "%25dst%25"
-:DONE
-</PostBuildEvent>
-  </PropertyGroup>
+  <Target Name="CopyToUnityLibs" Condition="Exists('$(SolutionDir)..\..\..\Assets\Xbox Live')" AfterTargets="LayoutPlugin">
+    <Message Text="Copying binaries to Unity Libs folder $(SolutionDir)..\..\..\Assets\Xbox Live\libs" />
+    <MakeDir Directories="$(SolutionDir)..\..\..\Assets\Xbox Live\libs" />
+    <ItemGroup>
+      <PluginFiles Include="$(PluginLayoutPath)\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(PluginFiles)" DestinationFolder="$(SolutionDir)..\..\..\Assets\Xbox Live\libs\UWP" />
+  </Target>
 </Project>
