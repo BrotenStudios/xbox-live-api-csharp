@@ -70,7 +70,6 @@ namespace UWPIntegration
                 XboxLiveContext services = new XboxLiveContext(xblUser);
                 try
                 {
-                    services.ProfileService.GetUserProfileAsync(xblUser.XboxUserId).Wait();
                     services.LeaderboardService.GetLeaderboardAsync("MostEnemysDefeated", new LeaderboardQuery()).ContinueWith((Task<LeaderboardResult> lbResult) =>
                     {
                         Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>

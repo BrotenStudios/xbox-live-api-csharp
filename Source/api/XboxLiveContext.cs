@@ -38,60 +38,15 @@ namespace Microsoft.Xbox.Services
                 this.AppConfig = null;
             }
             this.Settings = new XboxLiveContextSettings();
-
-            this.AchievementService = new AchievementService();
-            this.ContextualSearchService = new ContextualSearchService();
-            this.EventsService = new EventsService();
-            this.GameServerPlatformService = new GameServerPlatformService();
+            
             this.LeaderboardService = UseMockServices ? (ILeaderboardService)new MockLeaderboardService(user, Settings, AppConfig) : new LeaderboardService(user, Settings, AppConfig);
-            this.MatchmakingService = new MatchmakingService();
-            this.MultiplayerService = new MultiplayerService();
-            this.PresenceService = new PresenceService();
-            this.PrivacyService = new PrivacyService();
-            this.ProfileService = new ProfileService(this.AppConfig, this, this.Settings);
-            this.RealTimeActivityService = new RealTimeActivityService();
-            this.ReputationService = new ReputationService();
-            this.SocialService = new SocialService();
-            this.StringService = new StringService();
-            this.TitleStorageService = new TitleStorageService();
-            this.UserStatisticsService = new UserStatisticsService();
         }
 
         public XboxLiveAppConfiguration AppConfig { get; private set; }
 
         public XboxLiveContextSettings Settings { get; private set; }
 
-        public EventsService EventsService { get; private set; }
-
-        public ContextualSearchService ContextualSearchService { get; private set; }
-
-        public StringService StringService { get; private set; }
-
-        public PrivacyService PrivacyService { get; private set; }
-
-        public TitleStorageService TitleStorageService { get; private set; }
-
-        public GameServerPlatformService GameServerPlatformService { get; private set; }
-
-        public PresenceService PresenceService { get; private set; }
-
-        public RealTimeActivityService RealTimeActivityService { get; private set; }
-
-        public MultiplayerService MultiplayerService { get; private set; }
-
-        public MatchmakingService MatchmakingService { get; private set; }
-
-        public UserStatisticsService UserStatisticsService { get; private set; }
-
         public ILeaderboardService LeaderboardService { get; private set; }
-
-        public AchievementService AchievementService { get; private set; }
-
-        public ReputationService ReputationService { get; private set; }
-
-        public SocialService SocialService { get; private set; }
-
-        public ProfileService ProfileService { get; private set; }
 
         public XboxLiveUser User { get; private set; }
     }

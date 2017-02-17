@@ -12,7 +12,6 @@
         <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="113,204,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top"/>
         <Button x:Name="leaderboardButton" Content="Get Leaderboard" HorizontalAlignment="Left" Margin="340,200,0,0" VerticalAlignment="Top" Click="leaderboardButton_Click"/>
         <TextBlock x:Name="leaderboardData" HorizontalAlignment="Left" Margin="340,250,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top"/>
-        <Button x:Name="websocketButton" Content="Test Websocket" HorizontalAlignment="Left" Margin="250,250,0,0" VerticalAlignment="Top" Width="66" Click="websocketButton_Click"/>
 
     </Grid>
 </Page>
