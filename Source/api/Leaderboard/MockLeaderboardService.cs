@@ -29,7 +29,7 @@ namespace Microsoft.Xbox.Services.Leaderboard
             this.appConfig = appConfig;
         }
 
-        public Task<LeaderboardResult> GetLeaderboardAsync(string leaderboardName, LeaderboardQuery query)
+        public Task<LeaderboardResult> GetLeaderboardAsync(string statName, LeaderboardQuery query)
         {
 
             return Task.FromResult<LeaderboardResult>(CreateLeaderboardResponse());

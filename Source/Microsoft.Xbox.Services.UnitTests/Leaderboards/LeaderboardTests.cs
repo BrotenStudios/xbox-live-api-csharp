@@ -74,11 +74,11 @@ namespace Microsoft.Xbox.Services.UnitTests.Social
         [TestMethod]
         public async Task GetLeaderboard()
         {
-            LeaderboardResult result = await context.LeaderboardService.GetLeaderboardAsync("MostEnemysDefeated", new LeaderboardQuery());
+            LeaderboardResult result = await context.LeaderboardService.GetLeaderboardAsync("Jumps", new LeaderboardQuery());
             MockXboxLiveData.MockRequestData mockRequestData = MockXboxLiveData.MockResponses["defaultLeaderboardData"];
             JObject responseJson = JObject.Parse(mockRequestData.Response.ResponseBodyString);
             Assert.AreEqual("GET", mockRequestData.Request.Method);
-            Assert.AreEqual("https://leaderboards.xboxlive.com/scids/00000000-0000-0000-0000-0000694f5acb/leaderboards/MostEnemysDefeated", mockRequestData.Request.Url);
+            Assert.AreEqual("https://leaderboards.xboxlive.com/scids/00000000-0000-0000-0000-0000694f5acb/leaderboards/stat(Jumps)", mockRequestData.Request.Url);
             Assert.IsTrue(result.HasNext);
             VerifyLeaderboardResult(result, responseJson);
 
@@ -87,7 +87,7 @@ namespace Microsoft.Xbox.Services.UnitTests.Social
             MockXboxLiveData.MockRequestData mockRequestDataWithContinuationToken = MockXboxLiveData.MockResponses["defaultLeaderboardDataWithContinuationToken"];
             JObject responseJsonWithContinuationToken = JObject.Parse(mockRequestDataWithContinuationToken.Response.ResponseBodyString);
             Assert.AreEqual("GET", mockRequestDataWithContinuationToken.Request.Method);
-            Assert.AreEqual("https://leaderboards.xboxlive.com/scids/00000000-0000-0000-0000-0000694f5acb/leaderboards/MostEnemysDefeated?maxItems=100&continuationToken=6", mockRequestDataWithContinuationToken.Request.Url);
+            Assert.AreEqual("https://leaderboards.xboxlive.com/scids/00000000-0000-0000-0000-0000694f5acb/leaderboards/stat(Jumps)?maxItems=100&continuationToken=6", mockRequestDataWithContinuationToken.Request.Url);
             Assert.IsFalse(nextResult.HasNext);
             VerifyLeaderboardResult(nextResult, responseJsonWithContinuationToken);
         }

@@ -3,7 +3,7 @@
         "Request" :  {
             "method": "GET",
             "serverName": "https://leaderboards.xboxlive.com",
-            "pathQueryFragment": "/scids/00000000-0000-0000-0000-0000694f5acb/leaderboards/MostEnemysDefeated"
+            "pathQueryFragment": "/scids/00000000-0000-0000-0000-0000694f5acb/leaderboards/stat(Jumps)"
         },
         "Response" : {
             "httpStatus": 200,
@@ -73,7 +73,7 @@
         "Request" :  {
             "method": "GET",
             "serverName": "https://leaderboards.xboxlive.com",
-            "pathQueryFragment": "/scids/00000000-0000-0000-0000-0000694f5acb/leaderboards/MostEnemysDefeated?maxItems=100&continuationToken=6"
+            "pathQueryFragment": "/scids/00000000-0000-0000-0000-0000694f5acb/leaderboards/stat(Jumps)?maxItems=100&continuationToken=6"
         },
         "Response" : {
             "httpStatus": 200,

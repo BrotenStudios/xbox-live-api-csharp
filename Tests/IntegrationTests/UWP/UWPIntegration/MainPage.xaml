@@ -11,6 +11,7 @@
         <Button x:Name="button" Content="Sign In" HorizontalAlignment="Left" Margin="250,200,0,0" VerticalAlignment="Top" Click="button_Click"/>
         <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="113,204,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top"/>
         <Button x:Name="leaderboardButton" Content="Get Leaderboard" HorizontalAlignment="Left" Margin="340,200,0,0" VerticalAlignment="Top" Click="leaderboardButton_Click"/>
+        <Button x:Name="statsButton" Content="WriteStats" HorizontalAlignment="Left" Margin="500,200,0,0" VerticalAlignment="Top" Click="StatsButton_Click"/>
         <TextBlock x:Name="leaderboardData" HorizontalAlignment="Left" Margin="340,250,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top"/>
 
     </Grid>

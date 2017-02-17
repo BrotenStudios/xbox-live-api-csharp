@@ -17,8 +17,18 @@ namespace Microsoft.Xbox.Services.Leaderboard
 
     public interface ILeaderboardService
     {
-
-        Task<LeaderboardResult> GetLeaderboardAsync(string leaderboardName, LeaderboardQuery query);
+        /// <summary>
+        /// Get a leaderboard for a single leaderboard given a stat name and query parameters.
+        /// </summary>
+        /// <param name="statName">Stat name of the leaderboard</param>
+        /// <param name="quert">An object that contains query information</param>
+        /// <returns>
+        /// A LeaderboardResult object containing a collection of the leaderboard columns and rows
+        /// </returns>
+        /// <remarks>
+        /// This stat needs to be configured on DevCenter for your title
+        /// </remarks>
+        Task<LeaderboardResult> GetLeaderboardAsync(string statName, LeaderboardQuery query);
 
         Task<LeaderboardResult> GetSocialLeaderboardAsync(string leaderboardName, string socialGroup, LeaderboardQuery query);
 

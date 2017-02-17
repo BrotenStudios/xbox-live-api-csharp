@@ -23,6 +23,7 @@ namespace Microsoft.Xbox.Services.Leaderboard
         private readonly XboxLiveUser userContext;
         private readonly XboxLiveContextSettings xboxLiveContextSettings;
         private readonly XboxLiveAppConfiguration appConfig;
+        private static string leaderboardAPIContract = "4";
 
         internal LeaderboardService(XboxLiveUser userContext, XboxLiveContextSettings xboxLiveContextSettings, XboxLiveAppConfiguration appConfig)
         {
@@ -31,14 +32,14 @@ namespace Microsoft.Xbox.Services.Leaderboard
             this.appConfig = appConfig;
         }
 
-        public Task<LeaderboardResult> GetLeaderboardAsync(string leaderboardName, LeaderboardQuery query)
+        public Task<LeaderboardResult> GetLeaderboardAsync(string statName, LeaderboardQuery query)
         {
             string xuid = null;
             if(query.SkipResultToMe)
             {
                 xuid = userContext.XboxUserId;
             }
-            return this.GetLeaderboardInternal(xuid, appConfig.ServiceConfigurationId, leaderboardName, null, xuid, query.SkipResultsToRank, null, query.MaxItems, null, LeaderboardRequestType.Global);
+            return this.GetLeaderboardInternal(xuid, appConfig.ServiceConfigurationId, statName, null, xuid, query.SkipResultsToRank, null, query.MaxItems, null, LeaderboardRequestType.Global);
         }
 
         public Task<LeaderboardResult> GetSocialLeaderboardAsync(string leaderboardName, string socialGroup, LeaderboardQuery query)
@@ -74,7 +75,7 @@ namespace Microsoft.Xbox.Services.Leaderboard
             }
 
             XboxLiveHttpRequest request = XboxLiveHttpRequest.Create(xboxLiveContextSettings, HttpMethod.Get, leaderboardsBaseUri.ToString(), requestPath);
-            request.ContractVersion = "3";
+            request.ContractVersion = leaderboardAPIContract;
             return request.GetResponseWithAuth(userContext, HttpCallResponseBodyType.JsonBody)
                 .ContinueWith(
                     responseTask =>
@@ -134,7 +135,7 @@ namespace Microsoft.Xbox.Services.Leaderboard
         private string CreateLeaderboardUrlPath(string serviceConfigurationId, string leaderboardName, string xuid, uint maxItems, string skipToXboxUserId, uint skipToRank, string continuationToken, string socialGroup)
         {
             StringBuilder requestPath = new StringBuilder();
-            requestPath.AppendFormat("scids/{0}/leaderboards/{1}?", serviceConfigurationId, leaderboardName);
+            requestPath.AppendFormat("scids/{0}/leaderboards/stat({1})?", serviceConfigurationId, leaderboardName);
 
             if (xuid != null)
             {

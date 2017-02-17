@@ -52,6 +52,7 @@ namespace UWPIntegration
                     if (res.Status == SignInStatus.Success)
                     {
                         textBlock.Text = xblUser.Gamertag;
+                        StatsManager.Singleton.AddLocalUser(xblUser);
                     }
                     else
                     {
@@ -63,6 +64,18 @@ namespace UWPIntegration
 
         }
 
+        int jumps = 0;
+
+        private void StatsButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (xblUser.IsSignedIn)
+            {
+                StatsManager.Singleton.SetStatAsInteger(xblUser, "Jumps", jumps++);
+                StatsManager.Singleton.RequestFlushToService(xblUser);
+                StatsManager.Singleton.DoWork();
+            }
+        }
+
         private void leaderboardButton_Click(object sender, RoutedEventArgs e)
         {
             if(xblUser.IsSignedIn)
@@ -70,7 +83,7 @@ namespace UWPIntegration
                 XboxLiveContext services = new XboxLiveContext(xblUser);
                 try
                 {
-                    services.LeaderboardService.GetLeaderboardAsync("MostEnemysDefeated", new LeaderboardQuery()).ContinueWith((Task<LeaderboardResult> lbResult) =>
+                    services.LeaderboardService.GetLeaderboardAsync("Jumps", new LeaderboardQuery()).ContinueWith((Task<LeaderboardResult> lbResult) =>
                     {
                         Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                         {
