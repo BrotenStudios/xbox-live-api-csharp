@@ -13,12 +13,10 @@ namespace Microsoft.Xbox.Services.Leaderboard
 
     public enum LeaderboardStatType
     {
-        UInt64,
-        Boolean,
+        Integer,
         Double,
         String,
-        DateTime,
-        Other
+        Unknown
     }
 
     public class LeaderboardColumn

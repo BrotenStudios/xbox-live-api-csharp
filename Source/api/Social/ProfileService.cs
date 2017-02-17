@@ -47,7 +47,7 @@ namespace Microsoft.Xbox.Services.Social
                 throw new ArgumentOutOfRangeException("xboxUserIds", "Empty list of user ids");
             }
 
-            if (XboxLiveContext.UseMockData)
+            if (XboxLiveContext.UseMockServices)
             {
                 Random rand = new Random();
                 List<XboxUserProfile> outputUsers = new List<XboxUserProfile>(xboxUserIds.Count);

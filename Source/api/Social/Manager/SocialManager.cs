@@ -33,7 +33,7 @@ namespace Microsoft.Xbox.Services.Social.Manager
         {
             get
             {
-                return instance ?? (instance = XboxLiveContext.UseMockData ? new MockSocialManager() : (ISocialManager)new SocialManager());
+                return instance ?? (instance = XboxLiveContext.UseMockServices ? new MockSocialManager() : (ISocialManager)new SocialManager());
             }
         }
 

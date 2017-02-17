@@ -23,7 +23,7 @@ namespace Microsoft.Xbox.Services
 
         public Task<SignInResult> SignInAsync()
         {
-            if (XboxLiveContext.UseMockData)
+            if (XboxLiveContext.UseMockServices)
             {
                 this.mockUserImpl.IsSignedIn = true;
                 this.mockUserImpl.Gamertag = "2 dev 7727";
@@ -36,7 +36,7 @@ namespace Microsoft.Xbox.Services
 
         public Task<SignInResult> SignInSilentlyAsync()
         {
-            if (XboxLiveContext.UseMockData)
+            if (XboxLiveContext.UseMockServices)
             {
                 this.mockUserImpl.IsSignedIn = true;
                 this.mockUserImpl.Gamertag = "2 dev 7727";
@@ -49,7 +49,7 @@ namespace Microsoft.Xbox.Services
 
         public Task<SignInResult> SwitchAccountAsync()
         {
-            if (XboxLiveContext.UseMockData)
+            if (XboxLiveContext.UseMockServices)
             {
                 this.mockUserImpl.IsSignedIn = true;
                 this.mockUserImpl.Gamertag = "2 dev 7727";
@@ -74,7 +74,7 @@ namespace Microsoft.Xbox.Services
 
         public Task<TokenAndSignatureResult> GetTokenAndSignatureAsync(string httpMethod, string url, string headers, string body)
         {
-            if (XboxLiveContext.UseMockData)
+            if (XboxLiveContext.UseMockServices)
             {
                 return Task.FromResult(new TokenAndSignatureResult
                 {

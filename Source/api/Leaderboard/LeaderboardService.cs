@@ -5,6 +5,8 @@
 //  </copyright>
 // -----------------------------------------------------------------------
 
+using Newtonsoft.Json;
+
 namespace Microsoft.Xbox.Services.Leaderboard
 {
     using global::System;
@@ -36,20 +38,100 @@ namespace Microsoft.Xbox.Services.Leaderboard
             {
                 xuid = userContext.XboxUserId;
             }
-            return this.GetLeaderboardInternal(userContext.XboxUserId, appConfig.ServiceConfigurationId, leaderboardName, null, xuid, query.SkipResultsToRank, null, query.MaxItems, null);
+            return this.GetLeaderboardInternal(xuid, appConfig.ServiceConfigurationId, leaderboardName, null, xuid, query.SkipResultsToRank, null, query.MaxItems, null, LeaderboardRequestType.Global);
         }
 
         public Task<LeaderboardResult> GetSocialLeaderboardAsync(string leaderboardName, string socialGroup, LeaderboardQuery query)
         {
+            if (string.IsNullOrEmpty(socialGroup))
+            {
+                throw new XboxException("socialGroup parameter is required for getting Leaderboard for social group.");
+            }
+
+            if (string.Equals(socialGroup, "people", StringComparison.CurrentCultureIgnoreCase))
+            {
+                socialGroup = "all";
+            }
+
             string xuid = null;
             if (query.SkipResultToMe)
             {
                 xuid = userContext.XboxUserId;
             }
-            return this.GetLeaderboardForSocialGroupInternal(userContext.XboxUserId, appConfig.ServiceConfigurationId, leaderboardName, socialGroup, xuid, query.SkipResultsToRank, null, query.MaxItems, null);
+            return this.GetLeaderboardInternal(xuid, appConfig.ServiceConfigurationId, leaderboardName, socialGroup, xuid, query.SkipResultsToRank, null, query.MaxItems, null, LeaderboardRequestType.Social);
         }
 
-        internal Task<LeaderboardResult> GetLeaderboardInternal(string xuid, string serviceConfigurationId, string leaderboardName, string socialGroup, string skipToXboxUserId, uint skipToRank, string[] additionalColumns, uint maxItems, string continuationToken)
+        internal Task<LeaderboardResult> GetLeaderboardInternal(string xuid, string serviceConfigurationId, string leaderboardName, string socialGroup, string skipToXboxUserId, uint skipToRank, string[] additionalColumns, uint maxItems, string continuationToken, LeaderboardRequestType leaderboardType)
+        {
+            string requestPath = "";
+            if (leaderboardType == LeaderboardRequestType.Social)
+            {
+                requestPath  = CreateSocialLeaderboardUrlPath(serviceConfigurationId, leaderboardName, userContext.XboxUserId, maxItems, skipToXboxUserId, skipToRank, continuationToken, socialGroup);
+            }
+            else
+            {
+                requestPath = CreateLeaderboardUrlPath(serviceConfigurationId, leaderboardName, xuid, maxItems, skipToXboxUserId, skipToRank, continuationToken, socialGroup);
+            }
+
+            XboxLiveHttpRequest request = XboxLiveHttpRequest.Create(xboxLiveContextSettings, HttpMethod.Get, leaderboardsBaseUri.ToString(), requestPath);
+            request.ContractVersion = "3";
+            return request.GetResponseWithAuth(userContext, HttpCallResponseBodyType.JsonBody)
+                .ContinueWith(
+                    responseTask =>
+                    {
+                        var leaderboardRequestType = LeaderboardRequestType.Global;
+                        if (socialGroup != null)
+                        {
+                            leaderboardRequestType = LeaderboardRequestType.Social;
+                        }
+                        LeaderboardRequest leaderboardRequest = new LeaderboardRequest(leaderboardRequestType, leaderboardName);
+                        return this.HandleLeaderboardResponse(leaderboardRequest, responseTask);
+                    });
+        }
+
+        internal LeaderboardResult HandleLeaderboardResponse(LeaderboardRequest request, Task<XboxLiveHttpResponse> responseTask)
+        {
+            XboxLiveHttpResponse response = responseTask.Result;
+
+            LeaderboardResponse lbResponse = JsonSerialization.FromJson<LeaderboardResponse>(response.ResponseBodyString);
+
+            IList<LeaderboardColumn> columns = new List<LeaderboardColumn>() { lbResponse.LeaderboardInfo.Column };
+
+            IList<LeaderboardRow> rows = new List<LeaderboardRow>();
+            foreach(LeaderboardRowResponse row in lbResponse.Rows)
+            {
+                LeaderboardRow newRow = new LeaderboardRow()
+                {
+                    Gamertag = row.Gamertag,
+                    Percentile = row.Percentile,
+                    Rank = row.Rank,
+                    XboxUserId = row.XboxUserId,
+                };
+                if(row.Value != null)
+                {
+                    newRow.Values = new List<string>();
+                    newRow.Values.Add(row.Value);
+                }
+                else
+                {
+                    newRow.Values = row.Values;
+                }
+                rows.Add(newRow);
+            }
+
+            if (lbResponse.PagingInfo != null)
+            {
+                request.ContinuationToken = lbResponse.PagingInfo.ContinuationToken;
+            }
+
+            LeaderboardResult result = new LeaderboardResult(lbResponse.LeaderboardInfo.TotalCount, columns, rows, userContext, xboxLiveContextSettings, appConfig)
+            {
+                Request = request
+            };
+            return result;
+        }
+
+        private string CreateLeaderboardUrlPath(string serviceConfigurationId, string leaderboardName, string xuid, uint maxItems, string skipToXboxUserId, uint skipToRank, string continuationToken, string socialGroup)
         {
             StringBuilder requestPath = new StringBuilder();
             requestPath.AppendFormat("scids/{0}/leaderboards/{1}?", serviceConfigurationId, leaderboardName);
@@ -91,68 +173,41 @@ namespace Microsoft.Xbox.Services.Leaderboard
             // Remove the trailing query string bit
             requestPath.Remove(requestPath.Length - 1, 1);
 
-            XboxLiveHttpRequest request = XboxLiveHttpRequest.Create(xboxLiveContextSettings, HttpMethod.Get, leaderboardsBaseUri.ToString(), requestPath.ToString());
-            request.ContractVersion = "3";
-            return request.GetResponseWithAuth(userContext, HttpCallResponseBodyType.JsonBody)
-                .ContinueWith(
-                    responseTask =>
-                    {
-                        LeaderboardRequest leaderboardRequest = new LeaderboardRequest(LeaderboardRequestType.Global);
-                        return this.HandleLeaderboardResponse(leaderboardRequest, responseTask);
-                    });
+            return requestPath.ToString();
         }
 
-        internal Task<LeaderboardResult> GetLeaderboardForSocialGroupInternal(string xboxUserId, string serviceConfigurationId, string statisticName, string socialGroup, string skipToXboxUserId, uint skipToRank, string sortOrder, uint maxItems, string continuationToken)
+        private string CreateSocialLeaderboardUrlPath(string serviceConfigurationId, string leaderboardName, string xuid, uint maxItems, string skipToXboxUserId, uint skipToRank, string continuationToken, string socialGroup)
         {
-            string requestPath = string.Format("/scids/{0}/leaderboards/{1}", serviceConfigurationId);
-            XboxLiveHttpRequest request = XboxLiveHttpRequest.Create(xboxLiveContextSettings, HttpMethod.Get, leaderboardsBaseUri.ToString(), requestPath);
+            StringBuilder requestPath = new StringBuilder();
+            requestPath.AppendFormat("/users/xuid({0})scids/{1}/stats/{2}/people/{3}?", xuid, serviceConfigurationId, leaderboardName, socialGroup);
 
-            return request.GetResponseWithAuth(userContext, HttpCallResponseBodyType.JsonBody)
-                .ContinueWith(
-                    responseTask =>
-                    {
-                        LeaderboardRequest leaderboardRequest = new LeaderboardRequest(LeaderboardRequestType.Social);
-                        return this.HandleLeaderboardResponse(leaderboardRequest, responseTask);
-                    });
-        }
-
-        internal LeaderboardResult HandleLeaderboardResponse(LeaderboardRequest request, Task<XboxLiveHttpResponse> responseTask)
-        {
-            XboxLiveHttpResponse response = responseTask.Result;
-
-            LeaderboardResponse lbResponse = JsonSerialization.FromJson<LeaderboardResponse>(response.ResponseBodyString);
-
-            IList<LeaderboardColumn> columns = new List<LeaderboardColumn>() { lbResponse.LeaderboardInfo.Column };
-
-            IList<LeaderboardRow> rows = new List<LeaderboardRow>();
-            foreach(LeaderboardRowResponse row in lbResponse.Rows)
+            if (maxItems > 0)
             {
-                LeaderboardRow newRow = new LeaderboardRow()
-                {
-                    Gamertag = row.Gamertag,
-                    Percentile = row.Percentile,
-                    Rank = row.Rank,
-                    XboxUserId = row.XboxUserId,
-                };
-                if(row.Value != null)
-                {
-                    newRow.Values = new List<string>();
-                    newRow.Values.Add(row.Value);
-                }
-                else
-                {
-                    newRow.Values = row.Values;
-                }
-                rows.Add(newRow);
+                AppendQueryParameter(requestPath, "maxItems", maxItems);
             }
 
-            request.ContinuationToken = lbResponse.ContinuationToken;
-
-            LeaderboardResult result = new LeaderboardResult(lbResponse.LeaderboardInfo.TotalCount, columns, rows, userContext, xboxLiveContextSettings, appConfig)
+            if (!string.IsNullOrEmpty(skipToXboxUserId) && skipToRank > 0)
             {
-                Request = request
-            };
-            return result;
+                throw new ArgumentException("Cannot provide both user and rank to skip to.");
+            }
+
+            if (continuationToken != null)
+            {
+                AppendQueryParameter(requestPath, "continuationToken", continuationToken);
+            }
+            else if (!string.IsNullOrEmpty(skipToXboxUserId))
+            {
+                AppendQueryParameter(requestPath, "skipToUser", skipToXboxUserId);
+            }
+            else if (skipToRank > 0)
+            {
+                AppendQueryParameter(requestPath, "skipToRank", skipToRank);
+            }
+
+            // Remove the trailing query string bit
+            requestPath.Remove(requestPath.Length - 1, 1);
+
+            return requestPath.ToString();
         }
 
         private static void AppendQueryParameter(StringBuilder builder, string parameterName, object parameterValue)

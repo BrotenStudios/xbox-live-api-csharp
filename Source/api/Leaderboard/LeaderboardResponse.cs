@@ -21,6 +21,12 @@ namespace Microsoft.Xbox.Services.Leaderboard
         public uint TotalCount { get; set; }
     }
 
+    internal class PagingInfo
+    {
+        [JsonProperty("continuationToken")]
+        public string ContinuationToken { get; set; }
+    }
+
     internal class LeaderboardRowResponse
     {
         public IList<string> Values
@@ -67,7 +73,7 @@ namespace Microsoft.Xbox.Services.Leaderboard
         public LeaderboardInfo LeaderboardInfo { get;  set; }
 
         [JsonProperty ("pagingInfo")]
-        public string ContinuationToken { get; set; }
+        public PagingInfo PagingInfo { get; set; }
 
         [JsonProperty("userList")]
         public IList<LeaderboardRowResponse> Rows { get; set; }

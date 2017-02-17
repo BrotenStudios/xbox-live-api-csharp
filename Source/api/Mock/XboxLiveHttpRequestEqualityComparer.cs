@@ -23,12 +23,8 @@ namespace Microsoft.Xbox.Services
             if (ReferenceEquals(x, null)) return false;
             if (ReferenceEquals(y, null)) return false;
             if (x.GetType() != y.GetType()) return false;
-            return CheckHeadersAreEqual(x.customHeaders, y.customHeaders)
-                   && string.Equals(x.Method, y.Method)
-                   && string.Equals(x.ContractVersion, y.ContractVersion)
-                   && string.Equals(x.ContentType, y.ContentType)
-                   && x.RetryAllowed == y.RetryAllowed
-                   && string.Equals(x.Url, y.Url);
+            return string.Equals(x.Method, y.Method)
+                && string.Equals(x.Url, y.Url);
         }
 
         private static bool CheckHeadersAreEqual(IDictionary<string, string> x, IDictionary<string, string> y)
@@ -46,9 +42,6 @@ namespace Microsoft.Xbox.Services
             unchecked
             {
                 var hashCode = obj.Method.GetHashCode();
-                hashCode = (hashCode * 397) ^ (obj.ContractVersion != null ? obj.ContractVersion.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (obj.ContentType != null ? obj.ContentType.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ obj.RetryAllowed.GetHashCode();
                 hashCode = (hashCode * 397) ^ obj.Url.GetHashCode();
                 return hashCode;
             }

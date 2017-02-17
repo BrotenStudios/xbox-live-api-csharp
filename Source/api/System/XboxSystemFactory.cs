@@ -27,7 +27,7 @@ namespace Microsoft.Xbox.Services.System
         public IXboxWebsocketClient CreateWebsocketClient()
         {
 #if WINDOWS_UWP
-            return new XboxWebsocketClient_WinRT();
+            return null;
 #else
             return null;
 #endif

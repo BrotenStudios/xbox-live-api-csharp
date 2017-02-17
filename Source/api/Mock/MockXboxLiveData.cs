@@ -15,7 +15,7 @@ namespace Microsoft.Xbox.Services
 
     public static class MockXboxLiveData
     {
-        private static readonly Dictionary<XboxLiveHttpRequest, XboxLiveHttpResponse> mockResponses = new Dictionary<XboxLiveHttpRequest, XboxLiveHttpResponse>(new XboxLiveHttpRequestEqualityComparer());
+        public static Dictionary<string, MockRequestData> MockResponses { get; set; }
 
         public static void Load(string path)
         {
@@ -25,40 +25,36 @@ namespace Microsoft.Xbox.Services
             }
 
             string rawData = File.ReadAllText(path);
-            List<MockRequestData> pairs = JsonConvert.DeserializeObject<List<MockRequestData>>(rawData);
-
-            foreach (MockRequestData pair in pairs)
-            {
-                AddMockResponse(pair.Request, pair.Response);
-            }
-        }
-
-        public static void AddMockResponse(XboxLiveHttpRequest request, XboxLiveHttpResponse response)
-        {
-            mockResponses[request] = response;
+            MockResponses = JsonConvert.DeserializeObject<Dictionary<string, MockRequestData>>(rawData);
         }
 
         public static XboxLiveHttpResponse GetMockResponse(XboxLiveHttpRequest request)
         {
             XboxLiveHttpResponse response;
-            if (!mockResponses.TryGetValue(request, out response))
+            XboxLiveHttpRequestEqualityComparer comparer = new XboxLiveHttpRequestEqualityComparer();
+            foreach (var mockData in MockResponses.Values)
             {
-                Dictionary<string, string> headers = new Dictionary<string, string>
+                if (comparer.Equals(request, mockData.Request))
                 {
-                    { "X-XblCorrelationId", Guid.NewGuid().ToString() },
-                    { "Date", DateTime.UtcNow.ToString("R") },
-                };
-
-                response = new MockXboxLiveHttpResponse(404, headers);
+                    return mockData.Response;
+                }
             }
 
-            return response;
+            Dictionary<string, string> headers = new Dictionary<string, string>
+            {
+                { "X-XblCorrelationId", Guid.NewGuid().ToString() },
+                { "Date", DateTime.UtcNow.ToString("R") },
+            };
+
+            return new MockXboxLiveHttpResponse(404, headers);
         }
 
-        private class MockRequestData
+        public class MockRequestData
         {
             public MockXboxLiveHttpRequest Request { get; set; }
             public MockXboxLiveHttpResponse Response { get; set; }
+
+            
         }
     }
 }

@@ -13,6 +13,7 @@ namespace Microsoft.Xbox.Services
     using global::System.Text;
 
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     public class MockXboxLiveHttpResponse : XboxLiveHttpResponse
     {
@@ -25,9 +26,10 @@ namespace Microsoft.Xbox.Services
         }
 
         [JsonConstructor]
-        public MockXboxLiveHttpResponse(int httpStatus, string body, HttpCallResponseBodyType bodyType, string characterSet, Dictionary<string, string> headers)
+        public MockXboxLiveHttpResponse(int httpStatus, JObject body, HttpCallResponseBodyType bodyType, string characterSet = null, Dictionary<string, string> headers = null)
         {
-            byte[] bodyBytes = Encoding.UTF8.GetBytes(body ?? "");
+            string bodyJson = JsonConvert.SerializeObject(body);
+            byte[] bodyBytes = Encoding.UTF8.GetBytes(bodyJson ?? "");
             Stream bodyStream = new MemoryStream(bodyBytes);
 
             WebHeaderCollection webHeaders = new WebHeaderCollection();
@@ -39,7 +41,7 @@ namespace Microsoft.Xbox.Services
                 }
             }
 
-            this.Initialize(httpStatus, bodyStream, bodyType, bodyStream.Length, characterSet, webHeaders);
+            this.Initialize(httpStatus, bodyStream, bodyType, bodyStream.Length, characterSet ?? "utf-8", webHeaders);
         }
     }
 }

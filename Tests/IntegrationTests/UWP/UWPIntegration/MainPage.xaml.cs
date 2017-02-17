@@ -89,29 +89,5 @@ namespace UWPIntegration
                 }
             }
         }
-        XboxWebSocketConnection webSocketConnection;
-        private void websocketButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (this.xblUser.IsSignedIn)
-            {
-                webSocketConnection = new XboxWebSocketConnection(this.xblUser, new Uri("wss://rta.xboxlive.com"), null, new XboxLiveServicesSettings());
-                webSocketConnection.EnsureConnected().ContinueWith((result) =>
-                {
-                    Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
-                        Windows.UI.Core.CoreDispatcherPriority.Normal,
-                        () =>
-                        {
-                            if (!result.IsFaulted)
-                            {
-                                leaderboardData.Text = "websocket connected";
-                            }
-                            else
-                            {
-                                leaderboardData.Text = "websocket not connected";
-                            }
-                        });
-                });
-            }
-        }
     }
 }

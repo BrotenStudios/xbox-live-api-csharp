@@ -41,8 +41,15 @@ namespace Microsoft.Xbox.Services.Leaderboard
 
         public bool HasNext
         {
-            get;
-            internal set;
+            get
+            {
+                if (this.Request == null || string.IsNullOrEmpty(this.Request.ContinuationToken))
+                {
+                    return false;
+                }
+
+                return true;
+            }
         }
 
         public IList<LeaderboardRow> Rows
@@ -72,16 +79,7 @@ namespace Microsoft.Xbox.Services.Leaderboard
                 throw new XboxException("LeaderboardResult does not have a next page.");
             }
             LeaderboardService service = new LeaderboardService(userContext, xboxLiveContextSettings, appConfig);
-
-            switch (this.Request.RequestType)
-            {
-                case LeaderboardRequestType.Global:
-                    return service.GetLeaderboardInternal(null, null, null, null, null, 0, null, 0, this.Request.ContinuationToken);
-                case LeaderboardRequestType.Social:
-                    return service.GetLeaderboardForSocialGroupInternal(null, null, null, null, null, 0, null, 0, this.Request.ContinuationToken);
-                default:
-                    throw new InvalidOperationException("Unable to handle LeaderBoardRequestType " + this.Request.RequestType);
-            }
+            return service.GetLeaderboardInternal(null, appConfig.ServiceConfigurationId, this.Request.LeaderboardName, null, null, 0, null, maxItems, this.Request.ContinuationToken, this.Request.RequestType);
         }
 
     }

@@ -209,7 +209,7 @@ namespace Microsoft.Xbox.Services
 
         public static XboxLiveHttpRequest Create(XboxLiveContextSettings settings, string httpMethod, string serverName, string pathQueryFragment)
         {
-            return XboxLiveContext.UseMockData ?
+            return XboxLiveContext.UseMockHttp ?
                 new MockXboxLiveHttpRequest(settings, httpMethod, serverName, pathQueryFragment) :
                 new XboxLiveHttpRequest(settings, httpMethod, serverName, pathQueryFragment);
         }

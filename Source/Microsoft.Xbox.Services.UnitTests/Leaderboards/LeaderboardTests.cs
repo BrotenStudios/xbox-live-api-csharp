@@ -7,10 +7,17 @@
 
 namespace Microsoft.Xbox.Services.UnitTests.Social
 {
+    using global::System;
+    using global::System.Collections.Generic;
+    using global::System.Configuration;
+    using global::System.Diagnostics;
     using global::System.Threading.Tasks;
     using Leaderboard;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Microsoft.Xbox.Services.Social.Manager;
+    using Microsoft.Xbox.Services;
+
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     [TestClass]
     public class LeaderboardTests : TestBase
@@ -18,8 +25,8 @@ namespace Microsoft.Xbox.Services.UnitTests.Social
         [TestInitialize]
         public override void TestInitialize()
         {
-            XboxLiveContext.UseMockData = true;
             base.TestInitialize();
+            MockXboxLiveData.Load(Environment.CurrentDirectory + "\\Leaderboards\\LeaderboardUT.json");
         }
 
         [TestCleanup]
@@ -27,24 +34,62 @@ namespace Microsoft.Xbox.Services.UnitTests.Social
         {
         }
 
-        [TestMethod]
-        public async Task GetLeaderboard()
+        void VerifyLeaderboardColumn(LeaderboardColumn column, JObject columnToVerify)
         {
-            LeaderboardResult res = await context.LeaderboardService.GetLeaderboardAsync("MostEnemysDefeated", new LeaderboardQuery());
+            Assert.AreNotEqual(column, null, "LeaderboardColumn was null.");
+            Assert.AreEqual(column.StatisticName, columnToVerify["statName"].ToString() );
+            Assert.AreEqual(column.StatisticType.ToString(), columnToVerify["type"].ToString());
+        }
 
-            Assert.AreEqual((int)res.TotalRowCount, res.Rows.Count, "Row counts Differ");
-            Assert.AreNotEqual(res.Rows, null, "Null Rows");
-            Assert.AreNotEqual(res.Columns, null, "Null Columns");
+        void VerifyLeaderboardRow(LeaderboardRow row, JObject rowToVerify)
+        {
+            Assert.AreNotEqual(row, null, "LeaderboardRow was null.");
+
+            Assert.AreEqual(row.Gamertag, rowToVerify["gamertag"].ToString());
+            Assert.AreEqual(row.XboxUserId, rowToVerify["xuid"].ToString());
+            Assert.AreEqual(row.Percentile, (double)rowToVerify["percentile"]);
+            Assert.AreEqual(row.Rank, (int)rowToVerify["rank"]);
+
+            // TODO Add checks for values
+        }
+
+        void VerifyLeaderboardResult(LeaderboardResult result, JObject resultToVerify)
+        {
+            Assert.AreNotEqual(result, null, "LeaderboardResult was null.");
+
+            JObject leaderboardInfoJson = JObject.Parse(resultToVerify["leaderboardInfo"].ToString());
+            Assert.AreEqual(result.TotalRowCount, (uint)leaderboardInfoJson["totalCount"]);
+
+            JObject jsonColumn = JObject.Parse(leaderboardInfoJson["columnDefinition"].ToString());
+            VerifyLeaderboardColumn(result.Columns[0], jsonColumn);
+
+            JArray jsonRows = (JArray)(resultToVerify)["userList"];
+            int index = 0;
+            foreach (var row in jsonRows)
+            {
+                VerifyLeaderboardRow(result.Rows[index++], (JObject)row);
+            }
         }
 
         [TestMethod]
-        public async Task GetSocialLeaderboard()
+        public async Task GetLeaderboard()
         {
-            LeaderboardResult res = await context.LeaderboardService.GetSocialLeaderboardAsync("MostEnemysDefeated", "", new LeaderboardQuery());
+            LeaderboardResult result = await context.LeaderboardService.GetLeaderboardAsync("MostEnemysDefeated", new LeaderboardQuery());
+            MockXboxLiveData.MockRequestData mockRequestData = MockXboxLiveData.MockResponses["defaultLeaderboardData"];
+            JObject responseJson = JObject.Parse(mockRequestData.Response.ResponseBodyString);
+            Assert.AreEqual("GET", mockRequestData.Request.Method);
+            Assert.AreEqual("https://leaderboards.xboxlive.com/scids/00000000-0000-0000-0000-0000694f5acb/leaderboards/MostEnemysDefeated", mockRequestData.Request.Url);
+            Assert.IsTrue(result.HasNext);
+            VerifyLeaderboardResult(result, responseJson);
 
-            Assert.AreEqual((int)res.TotalRowCount, res.Rows.Count, "Row counts Differ");
-            Assert.AreNotEqual(res.Rows, null, "Null Rows");
-            Assert.AreNotEqual(res.Columns, null, "Null Columns");
+            // Testing continuation token with GetNext.
+            LeaderboardResult nextResult = await result.GetNextAsync(100);
+            MockXboxLiveData.MockRequestData mockRequestDataWithContinuationToken = MockXboxLiveData.MockResponses["defaultLeaderboardDataWithContinuationToken"];
+            JObject responseJsonWithContinuationToken = JObject.Parse(mockRequestDataWithContinuationToken.Response.ResponseBodyString);
+            Assert.AreEqual("GET", mockRequestDataWithContinuationToken.Request.Method);
+            Assert.AreEqual("https://leaderboards.xboxlive.com/scids/00000000-0000-0000-0000-0000694f5acb/leaderboards/MostEnemysDefeated?maxItems=100&continuationToken=6", mockRequestDataWithContinuationToken.Request.Url);
+            Assert.IsFalse(nextResult.HasNext);
+            VerifyLeaderboardResult(nextResult, responseJsonWithContinuationToken);
         }
     }
 }
