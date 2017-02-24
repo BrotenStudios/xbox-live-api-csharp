@@ -46,10 +46,11 @@ namespace Microsoft.Xbox.Services.Stats.Manager
         {
             this.userStatContextMap = new Dictionary<string, StatsUserContext>();
             this.eventList = new List<StatEvent>();
-            this.statTimer = new CallBufferTimer(TimePerCall);
-            this.statPriorityTimer = new CallBufferTimer(TimePerCall);
 
+            this.statTimer = new CallBufferTimer(TimePerCall);
             this.statTimer.TimerCompleteEvent += this.CallBufferTimerCallback;
+
+            this.statPriorityTimer = new CallBufferTimer(TimePerCall);
             this.statPriorityTimer.TimerCompleteEvent += this.CallBufferTimerCallback;
         }
 
@@ -81,9 +82,7 @@ namespace Microsoft.Xbox.Services.Stats.Manager
             {
                 lock (this.userStatContextMap)
                 {
-                    bool isSignedIn = user.IsSignedIn;
-
-                    if (isSignedIn)
+                    if (user.IsSignedIn)
                     {
                         if (statsValueDocTask.IsCompleted)
                         {
@@ -100,12 +99,9 @@ namespace Microsoft.Xbox.Services.Stats.Manager
                             }
                         }
                     }
-
-                    lock (this.eventList)
-                    {
-                        this.eventList.Add(new StatEvent(StatEventType.LocalUserAdded, user, statsValueDocTask.Exception));
-                    }
                 }
+
+                this.AddEvent(new StatEvent(StatEventType.LocalUserAdded, user, statsValueDocTask.Exception));
             });
         }
 
@@ -125,18 +121,12 @@ namespace Microsoft.Xbox.Services.Stats.Manager
                         // write offline
                     }
 
-                    lock (this.eventList)
-                    {
-                        this.eventList.Add(new StatEvent(StatEventType.LocalUserRemoved, user, continuationTask.Exception));
-                    }
+                    this.AddEvent(new StatEvent(StatEventType.LocalUserRemoved, user, continuationTask.Exception));
                 });
             }
             else
             {
-                lock (this.eventList)
-                {
-                    this.eventList.Add(new StatEvent(StatEventType.LocalUserRemoved, user, null));
-                }
+                this.AddEvent(new StatEvent(StatEventType.LocalUserRemoved, user, null));
             }
 
             this.userStatContextMap.Remove(xboxUserId);
@@ -255,11 +245,16 @@ namespace Microsoft.Xbox.Services.Stats.Manager
                     }
                 }
 
-                lock (this.eventList)
-                {
-                    this.eventList.Add(new StatEvent(StatEventType.StatUpdateComplete, statsUserContext.user, continuationTask.Exception));
-                }
+                this.AddEvent(new StatEvent(StatEventType.StatUpdateComplete, statsUserContext.user, continuationTask.Exception));
             });
+        }
+
+        private void AddEvent(StatEvent statEvent)
+        {
+            lock (this.eventList)
+            {
+                this.eventList.Add(statEvent);
+            }
         }
 
         private void CallBufferTimerCallback(object caller, CallBufferReturnObject returnObject)

@@ -20,6 +20,8 @@ using Windows.UI.Xaml.Navigation;
 
 namespace UWPIntegration
 {
+    using Windows.UI.ViewManagement;
+
     /// <summary>
     /// Provides application-specific behavior to supplement the default Application class.
     /// </summary>
@@ -33,6 +35,7 @@ namespace UWPIntegration
         {
             this.InitializeComponent();
             this.Suspending += OnSuspending;
+            ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.PreferredLaunchViewSize;
         }
 
         /// <summary>

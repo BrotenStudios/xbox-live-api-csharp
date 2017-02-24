@@ -1,8 +1,11 @@
 // Copyright (c) Microsoft Corporation
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // 
+
 namespace Microsoft.Xbox.Services
 {
+    using global::System;
+
     public partial class XboxLiveAppConfiguration
     {
         public const string FileName = "XboxServices.config";
@@ -19,9 +22,9 @@ namespace Microsoft.Xbox.Services
 
         private XboxLiveAppConfiguration()
         {
-            AppSignInUISettings = new SignInUISettings();
+            this.AppSignInUISettings = new SignInUISettings();
         }
-      
+
         public SignInUISettings AppSignInUISettings { get; set; }
 
         public string PublisherId { get; set; }
@@ -37,7 +40,9 @@ namespace Microsoft.Xbox.Services
         public string ProductFamilyName { get; set; }
 
         internal string EnvironmentPrefix { get; set; }
+
         internal bool UseFirstPartyToken { get; set; }
+
         public string ServiceConfigurationId { get; set; }
 
         public uint TitleId { get; set; }
@@ -48,7 +53,22 @@ namespace Microsoft.Xbox.Services
 
         public static XboxLiveAppConfiguration Load()
         {
-            return Load(FileName);
+            try
+            {
+                // Attempt to load it from a file
+                return Load(FileName);
+            }
+            catch (Exception e)
+            {
+                // If we're unable to load the file for some reason, we can just use an empty file
+                // if mock data is enable.
+                if (XboxLiveContext.UseMockServices || XboxLiveContext.UseMockHttp)
+                {
+                    return new XboxLiveAppConfiguration();
+                }
+
+                throw new XboxException(string.Format("Unable to find or load Xbox Live configuration.  Make sure a properly configured {0} exists.", FileName), e);
+            }
         }
     }
 }

@@ -4,11 +4,14 @@
 namespace Microsoft.Xbox.Services
 {
     using global::System;
+    using global::System.Text;
+    using global::System.Threading.Tasks;
+
     using Microsoft.Xbox.Services.System;
 
     public partial class XboxLiveUser : IXboxLiveUser
     {
-        private IUserImpl userImpl;
+        private readonly IUserImpl userImpl;
 
         public static event EventHandler<SignInCompletedEventArgs> SignInCompleted;
         public static event EventHandler<SignOutCompletedEventArgs> SignOutCompleted;
@@ -61,5 +64,51 @@ namespace Microsoft.Xbox.Services
             }
         }
 
+        public Task<SignInResult> SignInAsync()
+        {
+            return this.userImpl.SignInImpl(true, false).ContinueWith(signInTask =>
+            {
+                OnSignInCompleted(this);
+
+                return signInTask.Result;
+            });
+        }
+
+        public Task<SignInResult> SignInSilentlyAsync()
+        {
+            return this.userImpl.SignInImpl(false, false);
+        }
+
+        public Task<SignInResult> SwitchAccountAsync()
+        {
+            return this.userImpl.SignInImpl(false, true);
+        }
+
+        public Task<TokenAndSignatureResult> GetTokenAndSignatureAsync(string httpMethod, string url, string headers)
+        {
+            return this.GetTokenAndSignatureArrayAsync(httpMethod, url, headers, null);
+        }
+
+        public Task<TokenAndSignatureResult> GetTokenAndSignatureAsync(string httpMethod, string url, string headers, string body)
+        {
+            return this.GetTokenAndSignatureArrayAsync(httpMethod, url, headers, body == null ? null : Encoding.UTF8.GetBytes(body));
+        }
+
+        public Task<TokenAndSignatureResult> GetTokenAndSignatureArrayAsync(string httpMethod, string url, string headers, byte[] body)
+        {
+            return this.userImpl.InternalGetTokenAndSignatureAsync(httpMethod, url, headers, body, false, false);
+        }
+
+        private static void OnSignInCompleted(IXboxLiveUser user)
+        {
+            var handler = SignInCompleted;
+            if (handler != null) handler(null, new SignInCompletedEventArgs(user));
+        }
+
+        private static void OnSignOutCompleted(IXboxLiveUser user)
+        {
+            var handler = SignOutCompleted;
+            if (handler != null) handler(null, new SignOutCompletedEventArgs(user));
+        }
     }
 }

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // 
+
+
 namespace Microsoft.Xbox.Services.Shared
 {
     using global::System;
@@ -28,7 +30,7 @@ namespace Microsoft.Xbox.Services.Shared
 
     internal class CallBufferTimer
     {
-        private readonly TimeSpan bufferTimePerCallSec;
+        private readonly TimeSpan duration;
         private readonly List<string> usersToCall = new List<string>();
         private readonly Dictionary<string, bool> usersToCallMap = new Dictionary<string, bool>();
 
@@ -39,9 +41,9 @@ namespace Microsoft.Xbox.Services.Shared
 
         public event EventHandler<CallBufferReturnObject> TimerCompleteEvent;
 
-        public CallBufferTimer(TimeSpan bufferTimePerCallSec)
+        public CallBufferTimer(TimeSpan duration)
         {
-            this.bufferTimePerCallSec = bufferTimePerCallSec;
+            this.duration = duration;
         }
 
         public void Fire()
@@ -67,22 +69,16 @@ namespace Microsoft.Xbox.Services.Shared
                         this.usersToCallMap[xuid] = true;
                     }
                 }
-
-                Task.Run(() =>
-                {
-                    lock (this.usersToCall)
-                    {
-                        this.FireHelper();
-                    }
-                });
             }
+
+            Task.Run(() => { this.FireHelper(); });
         }
 
         private void FireHelper()
         {
             if (!this.isTaskInProgress)
             {
-                TimeSpan timeDiff = (this.bufferTimePerCallSec - (DateTime.Now - this.previousTime));
+                TimeSpan timeDiff = (this.duration - (DateTime.Now - this.previousTime));
                 if (timeDiff.TotalMilliseconds < 0)
                 {
                     timeDiff = TimeSpan.Zero;
@@ -90,19 +86,20 @@ namespace Microsoft.Xbox.Services.Shared
                 this.isTaskInProgress = true;
                 this.previousTime = DateTime.Now;
 
-                var userCopy = this.usersToCall.ToList();
+                List<string> userCopy;
+                lock (this.usersToCall)
+                {
+                    userCopy = this.usersToCall.ToList();
+                }
                 var completionContext = this.callBufferTimerCompletionContext;
                 Task.Delay(timeDiff).ContinueWith((continuationAction) =>
                 {
-                    lock (this.usersToCall)
+                    this.isTaskInProgress = false;
+                    this.TimerCompleteEvent(this, new CallBufferReturnObject(userCopy, completionContext));
+                    if (this.isQueuedTask)
                     {
-                        this.isTaskInProgress = false;
-                        this.TimerCompleteEvent(this, new CallBufferReturnObject(userCopy, completionContext));
-                        if (this.isQueuedTask)
-                        {
-                            this.isQueuedTask = false;
-                            this.FireHelper();
-                        }
+                        this.isQueuedTask = false;
+                        this.FireHelper();
                     }
                 });
 

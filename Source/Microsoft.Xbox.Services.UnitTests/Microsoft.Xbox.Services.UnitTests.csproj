@@ -54,6 +54,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="CallBufferTimerTests.cs" />
     <Compile Include="Leaderboards\LeaderboardTests.cs" />
     <Compile Include="Social\EventQueueTests.cs" />
     <Compile Include="Social\InternalEventQueueTests.cs" />
@@ -62,6 +63,7 @@
     <Compile Include="Social\SocialUserGroupTests.cs" />
     <Compile Include="Social\SocialManagerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Stats\StatsManagerTests.cs" />
     <Compile Include="TestBase.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -79,9 +81,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="StatsManager\" />
-  </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

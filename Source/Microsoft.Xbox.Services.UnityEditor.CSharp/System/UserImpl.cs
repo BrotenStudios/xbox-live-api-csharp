@@ -1,15 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
-// 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Microsoft.Xbox.Services.System
 {
-    class UserImpl : IUserImpl
+    using global::System;
+    using global::System.Threading.Tasks;
+
+    internal class UserImpl : IUserImpl
     {
         public bool IsSignedIn { get; set; }
         public XboxLiveUser User { get; set; }
@@ -23,14 +20,31 @@ namespace Microsoft.Xbox.Services.System
 
         public Task<SignInResult> SignInImpl(bool showUI, bool forceRefresh)
         {
+            if (XboxLiveContext.UseMockServices)
+            {
+                this.IsSignedIn = true;
+                this.Gamertag = "Fake User";
+                this.XboxUserId = "123456789";
+
+                return Task.FromResult(new SignInResult(SignInStatus.Success));
+            }
+
             throw new NotImplementedException();
         }
-        public Task<TokenAndSignatureResult> GetTokenAndSignatureAsync(string httpMethod, string url, string headers, string requestBodyString)
-        {
-            throw new NotImplementedException();
-        }
+
         public Task<TokenAndSignatureResult> InternalGetTokenAndSignatureAsync(string httpMethod, string url, string headers, byte[] body, bool promptForCredentialsIfNeeded, bool forceRefresh)
         {
+            if (XboxLiveContext.UseMockServices)
+            {
+                return Task.FromResult(new TokenAndSignatureResult
+                {
+                    Gamertag = this.Gamertag,
+                    XboxUserId = this.XboxUserId,
+                    XboxUserHash = "",
+                    Token = "",
+                    Signature = "",
+                });
+            }
             throw new NotImplementedException();
         }
     }

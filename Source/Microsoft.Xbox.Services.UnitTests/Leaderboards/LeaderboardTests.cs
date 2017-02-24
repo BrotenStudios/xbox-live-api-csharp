@@ -1,18 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
-// 
-namespace Microsoft.Xbox.Services.UnitTests.Social
+
+namespace Microsoft.Xbox.Services.UnitTests.Leaderboards
 {
     using global::System;
-    using global::System.Collections.Generic;
-    using global::System.Configuration;
-    using global::System.Diagnostics;
     using global::System.Threading.Tasks;
-    using Leaderboard;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Microsoft.Xbox.Services;
 
-    using Newtonsoft.Json;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Microsoft.Xbox.Services.Leaderboard;
+
     using Newtonsoft.Json.Linq;
 
     [TestClass]
@@ -33,7 +29,7 @@ namespace Microsoft.Xbox.Services.UnitTests.Social
         void VerifyLeaderboardColumn(LeaderboardColumn column, JObject columnToVerify)
         {
             Assert.AreNotEqual(column, null, "LeaderboardColumn was null.");
-            Assert.AreEqual(column.StatisticName, columnToVerify["statName"].ToString() );
+            Assert.AreEqual(column.StatisticName, columnToVerify["statName"].ToString());
             Assert.AreEqual(column.StatisticType.ToString(), columnToVerify["type"].ToString());
         }
 
@@ -57,13 +53,13 @@ namespace Microsoft.Xbox.Services.UnitTests.Social
             Assert.AreEqual(result.TotalRowCount, (uint)leaderboardInfoJson["totalCount"]);
 
             JObject jsonColumn = JObject.Parse(leaderboardInfoJson["columnDefinition"].ToString());
-            VerifyLeaderboardColumn(result.Columns[0], jsonColumn);
+            this.VerifyLeaderboardColumn(result.Columns[0], jsonColumn);
 
             JArray jsonRows = (JArray)(resultToVerify)["userList"];
             int index = 0;
             foreach (var row in jsonRows)
             {
-                VerifyLeaderboardRow(result.Rows[index++], (JObject)row);
+                this.VerifyLeaderboardRow(result.Rows[index++], (JObject)row);
             }
         }
 
@@ -76,7 +72,7 @@ namespace Microsoft.Xbox.Services.UnitTests.Social
             Assert.AreEqual("GET", mockRequestData.Request.Method);
             Assert.AreEqual("https://leaderboards.xboxlive.com/scids/00000000-0000-0000-0000-0000694f5acb/leaderboards/stat(Jumps)", mockRequestData.Request.Url);
             Assert.IsTrue(result.HasNext);
-            VerifyLeaderboardResult(result, responseJson);
+            this.VerifyLeaderboardResult(result, responseJson);
 
             // Testing continuation token with GetNext.
             LeaderboardResult nextResult = await result.GetNextAsync(100);
@@ -85,7 +81,7 @@ namespace Microsoft.Xbox.Services.UnitTests.Social
             Assert.AreEqual("GET", mockRequestDataWithContinuationToken.Request.Method);
             Assert.AreEqual("https://leaderboards.xboxlive.com/scids/00000000-0000-0000-0000-0000694f5acb/leaderboards/stat(Jumps)?maxItems=100&continuationToken=6", mockRequestDataWithContinuationToken.Request.Url);
             Assert.IsFalse(nextResult.HasNext);
-            VerifyLeaderboardResult(nextResult, responseJsonWithContinuationToken);
+            this.VerifyLeaderboardResult(nextResult, responseJsonWithContinuationToken);
         }
     }
 }

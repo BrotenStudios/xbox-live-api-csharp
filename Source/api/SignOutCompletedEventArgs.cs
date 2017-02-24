@@ -7,11 +7,11 @@ namespace Microsoft.Xbox.Services
 
     public class SignOutCompletedEventArgs : EventArgs
     {
-        public SignOutCompletedEventArgs(XboxLiveUser user)
+        public SignOutCompletedEventArgs(IXboxLiveUser user)
         {
             this.User = user;
         }
 
-        public XboxLiveUser User { get; private set; }
+        public IXboxLiveUser User { get; private set; }
     }
 }

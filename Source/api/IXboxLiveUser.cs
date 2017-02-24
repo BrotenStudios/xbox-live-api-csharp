@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Xbox.Services
 {
-    interface IXboxLiveUser
+    public interface IXboxLiveUser
     {
         string WebAccountId
         {
@@ -39,14 +39,6 @@ namespace Microsoft.Xbox.Services
         {
             get;
         }
-
-#if WINDOWS_UWP
-        Task<SignInResult> SignInAsync(Windows.UI.Core.CoreDispatcher dispatcher);
-
-        Task<SignInResult> SignInSilentlyAsync(Windows.UI.Core.CoreDispatcher dispatcher);
-
-        Task<SignInResult> SwitchAccountAsync(Windows.UI.Core.CoreDispatcher dispatcher);
-#endif
 
         Task<SignInResult> SignInAsync();
 

@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // 
+
 namespace Microsoft.Xbox.Services
 {
-    using global::System.Diagnostics;
     using global::System.IO;
 
     public partial class XboxLiveAppConfiguration
@@ -14,31 +14,18 @@ namespace Microsoft.Xbox.Services
             Windows.Storage.StorageFolder installedLocation = package.InstalledLocation;
 
             string fullPath = Path.Combine(installedLocation.Path, path);
+            if (!File.Exists(fullPath))
+            {
+                throw new FileNotFoundException(string.Format("Unable to find Xbox Live app configuration file '{0}'.", path));
+            }
+
             string content = File.ReadAllText(fullPath);
-            Debug.WriteLine(content);
-
-            Stream file;
-            try
+            if (string.IsNullOrWhiteSpace(content))
             {
-                file = installedLocation.OpenStreamForReadAsync(path).Result;
-            }
-            catch (IOException e)
-            {
-                throw new XboxException("Unable to find configuration file " + path, e);
+                throw new XboxException(string.Format("Xbox Live app configeration file '{0}' was empty.", path));
             }
 
-            string json;
-            using (StreamReader reader = new StreamReader(file))
-            {
-                json = reader.ReadToEnd();
-            }
-
-            if (string.IsNullOrWhiteSpace(json))
-            {
-                throw new XboxException("Unable to load Xbox Live app configuration from " + path);
-            }
-
-            return JsonSerialization.FromJson<XboxLiveAppConfiguration>(json);
+            return JsonSerialization.FromJson<XboxLiveAppConfiguration>(content);
         }
     }
 }

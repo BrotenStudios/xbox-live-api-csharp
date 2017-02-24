@@ -1,108 +1,92 @@
 ﻿// Copyright (c) Microsoft Corporation
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
-using Microsoft.Xbox.Services.System;
-using Windows.Security.Authentication.Web.Core;
-using System.Threading.Tasks;
-using Microsoft.Xbox.Services.Stats.Manager;
-using Microsoft.Xbox.Services;
-using Microsoft.Xbox.Services.Leaderboard;
-using Microsoft.Xbox.Services.Shared;
-
-#pragma warning disable 4014
-
-// The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
 namespace UWPIntegration
 {
+    using System;
+    using System.Linq;
+
+    using Windows.UI.Xaml;
+    using Windows.UI.Xaml.Controls;
+
+    using Microsoft.Xbox.Services;
+    using Microsoft.Xbox.Services.Leaderboard;
+    using Microsoft.Xbox.Services.Social.Manager;
+    using Microsoft.Xbox.Services.Stats.Manager;
+
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        XboxLiveUser xblUser;
+        private readonly XboxLiveUser xblUser;
+
         public MainPage()
         {
             this.InitializeComponent();
-            xblUser = new XboxLiveUser();
+            this.xblUser = new XboxLiveUser();
         }
 
         private async void button_Click(object sender, RoutedEventArgs e)
         {
-            IReadOnlyList<Windows.System.User> users =  await Windows.System.User.FindAllAsync();
-            Windows.System.User user = null;
-            if (users.Count > 0)
-                user = users[0];
-            xblUser.SignInAsync(null).ContinueWith( (Task<SignInResult> result) => 
-            {
-                Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-                {
-                    SignInResult res = result.Result;
-                    if (res.Status == SignInStatus.Success)
-                    {
-                        textBlock.Text = xblUser.Gamertag;
-                        StatsManager.Singleton.AddLocalUser(xblUser);
-                    }
-                    else
-                    {
-                        textBlock.Text = "Not Signed In";
-                    }
+            var signInResult = await this.xblUser.SignInAsync(null);
 
-                });
+            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+            {
+                if (signInResult.Status == SignInStatus.Success)
+                {
+                    this.textBlock.Text = this.xblUser.Gamertag;
+                    StatsManager.Singleton.AddLocalUser(this.xblUser);
+                    SocialManager.Instance.AddLocalUser(this.xblUser, SocialManagerExtraDetailLevel.None);
+                }
+                else
+                {
+                    this.textBlock.Text = "Not Signed In";
+                }
             });
-
         }
 
-        int jumps = 0;
+        private int jumps;
 
-        private void StatsButton_Click(object sender, RoutedEventArgs e)
+        private async void leaderboardButton_Click(object sender, RoutedEventArgs e)
         {
-            if (xblUser.IsSignedIn)
+            if (this.xblUser.IsSignedIn)
             {
-                StatsManager.Singleton.SetStatAsInteger(xblUser, "Jumps", jumps++);
-                StatsManager.Singleton.RequestFlushToService(xblUser);
-                StatsManager.Singleton.DoWork();
-            }
-        }
+                XboxLiveContext services = new XboxLiveContext(this.xblUser);
+                var leaderboardResult = await services.LeaderboardService.GetLeaderboardAsync("jumps", new LeaderboardQuery());
 
-        private void leaderboardButton_Click(object sender, RoutedEventArgs e)
-        {
-            if(xblUser.IsSignedIn)
-            {
-                XboxLiveContext services = new XboxLiveContext(xblUser);
-                try
+                await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
-                    services.LeaderboardService.GetLeaderboardAsync("Jumps", new LeaderboardQuery()).ContinueWith((Task<LeaderboardResult> lbResult) =>
+                    this.leaderboardData.Text = "\nrows: " + leaderboardResult.Rows.Count + "\n";
+                    foreach (LeaderboardRow row in leaderboardResult.Rows)
                     {
-                        Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-                        {
-                            LeaderboardResult lbRes = lbResult.Result;
-                            leaderboardData.Text = "\nrows: " + lbRes.Rows.Count + "\n";
-                            foreach (LeaderboardRow row in lbRes.Rows)
-                            {
-                                leaderboardData.Text += row.Gamertag + ": " + row.Rank + "\n";
-                            }
-                        });
-                    });
-                }
-                catch (Exception)
-                {
-                }
+                        this.leaderboardData.Text += row.Gamertag + ": " + row.Rank + "\n";
+                    }
+                });
             }
+        }
+
+        private void WriteStats_Click(object sender, RoutedEventArgs e)
+        {
+            if (!this.xblUser.IsSignedIn) return;
+
+            StatsManager.Singleton.SetStatAsInteger(this.xblUser, "jumps", this.jumps++);
+        }
+
+        private void ReadStats_Click(object sender, RoutedEventArgs e)
+        {
+            if (!this.xblUser.IsSignedIn) return;
+
+            var statNames = StatsManager.Singleton.GetStatNames(this.xblUser);
+            this.StatsData.Text = string.Join(Environment.NewLine, statNames.Select(n => StatsManager.Singleton.GetStat(this.xblUser, n)).Select(s => $"{s.Name} ({s.Type}) = {s.Value}"));
+        }
+
+        private void StatsDoWork_Click(object sender, RoutedEventArgs e)
+        {
+            if (!this.xblUser.IsSignedIn) return;
+
+            StatsManager.Singleton.DoWork();
         }
     }
 }

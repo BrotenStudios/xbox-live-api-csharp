@@ -21,7 +21,7 @@ namespace Microsoft.Xbox.Services.System
         AuthConfig AuthConfig { get; }
 
         Task<SignInResult> SignInImpl(bool showUI, bool forceRefresh);
-        Task<TokenAndSignatureResult> GetTokenAndSignatureAsync(string httpMethod, string url, string headers, string requestBodyString);
+
         Task<TokenAndSignatureResult> InternalGetTokenAndSignatureAsync(string httpMethod, string url, string headers, byte[] body, bool promptForCredentialsIfNeeded, bool forceRefresh);
     }
 }
