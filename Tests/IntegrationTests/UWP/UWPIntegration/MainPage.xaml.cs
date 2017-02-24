@@ -30,7 +30,7 @@ namespace UWPIntegration
 
         private async void button_Click(object sender, RoutedEventArgs e)
         {
-            var signInResult = await this.xblUser.SignInAsync(null);
+            var signInResult = await this.xblUser.SignInAsync();
 
             await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {

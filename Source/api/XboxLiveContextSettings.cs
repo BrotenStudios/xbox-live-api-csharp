@@ -21,33 +21,7 @@ namespace Microsoft.Xbox.Services
         {
             get
             {
-                return dispatcher;
-            }
-
-            internal set
-            {
-                if (dispatcher != null)
-                {
-                    dispatcher = value;
-                }
-                else
-                {
-                    try
-                    {
-                        dispatcher = Windows.ApplicationModel.Core.CoreApplication.MainView.Dispatcher;
-                    }
-                    catch (Exception)
-                    {
-                    }
-                }
-
-                if (dispatcher != null)
-                {
-                    dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, new Windows.UI.Core.DispatchedHandler(() =>
-                    {
-                        // todo: generate locales
-                    }));
-                }
+                return dispatcher ?? (dispatcher = Windows.ApplicationModel.Core.CoreApplication.MainView.Dispatcher);
             }
         }
 #endif
