@@ -24,7 +24,7 @@ namespace Microsoft.Xbox.Services.System
             XboxLiveRelyingParty = "https://auth.xboxlive.com";
             UserTokenSiteName = GetEndpointPath("user.auth", "", Envrionment, false);
             RPSTicketPolicy = UseCompactTicket ? "MBI_SSL" : "DELEGATION";
-            RPSTicketService = UseCompactTicket ? UserTokenSiteName : "xboxlive.signin";
+            RPSTicketService = UseCompactTicket ? UserTokenSiteName : "xbl.signin xbl.friends";
         }
 
         public static string GetEndpointPath(string serviceName, string envrionmentPrefix, string envrionment, bool appendProtocol = true)
