@@ -53,7 +53,6 @@ namespace Microsoft.Xbox.Services.Stats.Manager
 
             req.RequestBody = JsonConvert.SerializeObject(svdModel, new JsonSerializerSettings
             {
-                ContractResolver = new CamelCasePropertyNamesContractResolver()
             });
 
             return req.GetResponseWithAuth(this.context.User, HttpCallResponseBodyType.JsonBody).ContinueWith(task =>
