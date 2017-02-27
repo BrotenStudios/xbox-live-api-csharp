@@ -159,6 +159,7 @@ namespace Microsoft.Xbox.Services.Stats.Manager
             }
 
             this.userStatContextMap[user.XboxUserId].statsValueDocument.SetStat(statName, value);
+            RequestFlushToService(user);
         }
 
         public void SetStatAsInteger(XboxLiveUser user, string statName, long value)
@@ -171,6 +172,7 @@ namespace Microsoft.Xbox.Services.Stats.Manager
             }
 
             this.userStatContextMap[user.XboxUserId].statsValueDocument.SetStat(statName, value);
+            RequestFlushToService(user);
         }
 
         public void SetStatAsString(XboxLiveUser user, string statName, string value)
@@ -183,6 +185,7 @@ namespace Microsoft.Xbox.Services.Stats.Manager
             }
 
             this.userStatContextMap[user.XboxUserId].statsValueDocument.SetStat(statName, value);
+            RequestFlushToService(user);
         }
 
         public void RequestFlushToService(XboxLiveUser user, bool isHighPriority = false)

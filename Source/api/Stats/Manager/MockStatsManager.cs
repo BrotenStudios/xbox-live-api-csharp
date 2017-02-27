@@ -65,14 +65,17 @@ namespace Microsoft.Xbox.Services.Stats.Manager
         public void SetStatAsNumber(XboxLiveUser user, string statName, double value)
         {
             statValueDocument.SetStat(statName, value);
+            RequestFlushToService(user);
         }
         public void SetStatAsInteger(XboxLiveUser user, string statName, Int64 value)
         {
             statValueDocument.SetStat(statName, (double)value);
+            RequestFlushToService(user);
         }
         public void SetStatAsString(XboxLiveUser user, string statName, string value)
         {
             statValueDocument.SetStat(statName, value);
+            RequestFlushToService(user);
         }
         public void RequestFlushToService(XboxLiveUser user, bool isHighPriority = false)
         {
