@@ -49,12 +49,30 @@ namespace UWPIntegration
 
         private int jumps;
 
-        private async void leaderboardButton_Click(object sender, RoutedEventArgs e)
+        private async void globalLeaderboardButton_Click(object sender, RoutedEventArgs e)
         {
             if (this.xblUser.IsSignedIn)
             {
                 XboxLiveContext services = new XboxLiveContext(this.xblUser);
                 var leaderboardResult = await services.LeaderboardService.GetLeaderboardAsync("jumps", new LeaderboardQuery());
+
+                await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                {
+                    this.leaderboardData.Text = "\nrows: " + leaderboardResult.Rows.Count + "\n";
+                    foreach (LeaderboardRow row in leaderboardResult.Rows)
+                    {
+                        this.leaderboardData.Text += row.Gamertag + ": " + row.Rank + "\n";
+                    }
+                });
+            }
+        }
+
+        private async void socialLeaderboardButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.xblUser.IsSignedIn)
+            {
+                XboxLiveContext services = new XboxLiveContext(this.xblUser);
+                var leaderboardResult = await services.LeaderboardService.GetSocialLeaderboardAsync("jumps", "all", new LeaderboardQuery());
 
                 await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {

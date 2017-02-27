@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+    mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="768"
     DataContext="{Binding RelativeSource={RelativeSource Self}}">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
@@ -14,7 +14,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        
+
         <StackPanel Orientation="Horizontal">
             <Button x:Name="button" Content="Sign In" Click="button_Click" Margin="12" Width="100"/>
             <TextBlock x:Name="textBlock" Text="TextBlock" VerticalAlignment="Center"/>
@@ -23,7 +23,8 @@
         <StackPanel Grid.Row="1" Margin="4">
             <TextBlock Text="Leaderboards" Margin="4" FontWeight="Bold"/>
             <StackPanel Orientation="Horizontal" >
-                <Button x:Name="leaderboardButton" Content="Get Leaderboard" Click="leaderboardButton_Click" Margin="4" VerticalAlignment="Top"/>
+                <Button x:Name="globalLeaderboardButton" Content="Query Global Leaderboard" Click="globalLeaderboardButton_Click" Margin="4" VerticalAlignment="Top"/>
+                <Button x:Name="socialLeaderboardButton" Content="Query Social Leaderboard" Click="socialLeaderboardButton_Click" Margin="4" VerticalAlignment="Top"/>
             </StackPanel>
             <TextBlock x:Name="leaderboardData" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="150" Margin="4"/>
         </StackPanel>

@@ -176,7 +176,7 @@ namespace Microsoft.Xbox.Services.Leaderboard
         private string CreateSocialLeaderboardUrlPath(string serviceConfigurationId, string leaderboardName, string xuid, uint maxItems, string skipToXboxUserId, uint skipToRank, string continuationToken, string socialGroup)
         {
             StringBuilder requestPath = new StringBuilder();
-            requestPath.AppendFormat("/users/xuid({0})scids/{1}/stats/{2}/people/{3}?", xuid, serviceConfigurationId, leaderboardName, socialGroup);
+            requestPath.AppendFormat("users/xuid({0})/scids/{1}/stats/{2}/people/{3}?", xuid, serviceConfigurationId, leaderboardName, socialGroup);
 
             if (maxItems > 0)
             {
