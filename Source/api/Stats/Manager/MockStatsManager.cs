@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Xbox.Services.System;
 using System.Linq;
+using Microsoft.Xbox.Services.Leaderboard;
+using global::System.Threading.Tasks;
 
 namespace Microsoft.Xbox.Services.Stats.Manager
 {
@@ -12,6 +14,8 @@ namespace Microsoft.Xbox.Services.Stats.Manager
     {
         private StatsValueDocument statValueDocument;
         private List<StatEvent> statEventList;
+        private MockLeaderboardService mockLBService;
+
         internal MockStatsManager()
         {
             this.LocalUsers = new List<XboxLiveUser>();
@@ -47,12 +51,13 @@ namespace Microsoft.Xbox.Services.Stats.Manager
         public void AddLocalUser(XboxLiveUser user)
         {
             this.LocalUsers.Add(user);
-            this.statEventList.Add(new StatEvent(StatEventType.LocalUserAdded, user, null));
+            mockLBService = new MockLeaderboardService(user, new XboxLiveContextSettings(), XboxLiveAppConfiguration.Instance);
+            this.statEventList.Add(new StatEvent(StatEventType.LocalUserAdded, user, null, new StatEventArgs()));
         }
         public void RemoveLocalUser(XboxLiveUser user)
         {
             this.LocalUsers.Remove(user);
-            this.statEventList.Add(new StatEvent(StatEventType.LocalUserRemoved, user, null));
+            this.statEventList.Add(new StatEvent(StatEventType.LocalUserRemoved, user, null, new StatEventArgs()));
         }
         public StatValue GetStat(XboxLiveUser user, string statName)
         {
@@ -88,6 +93,24 @@ namespace Microsoft.Xbox.Services.Stats.Manager
             statValueDocument.DoWork();
             this.statEventList.Clear();
             return copyList;
+        }
+        public void GetLeaderboard(XboxLiveUser user, string statName, LeaderboardQuery query)
+        {
+            if (mockLBService == null)
+            {
+                throw new ArgumentException("Local User needs to be added.");
+            }
+            mockLBService.GetLeaderboardAsync(statName, query);
+        }
+
+        public void GetSocialLeaderboard(XboxLiveUser user, string statName, string socialGroup, LeaderboardQuery query)
+        {
+            if (mockLBService == null)
+            {
+                throw new ArgumentException("Local User needs to be added.");
+            }
+            mockLBService.GetSocialLeaderboardAsync(statName, socialGroup, query);
+
         }
     }
 }

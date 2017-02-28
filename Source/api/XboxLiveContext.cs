@@ -42,7 +42,7 @@ namespace Microsoft.Xbox.Services
 
         public XboxLiveContextSettings Settings { get; private set; }
 
-        public ILeaderboardService LeaderboardService { get; private set; }
+        internal ILeaderboardService LeaderboardService { get; private set; }
 
         public XboxLiveUser User { get; private set; }
     }

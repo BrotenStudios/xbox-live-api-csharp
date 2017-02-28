@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Xbox.Services.System;
+using Microsoft.Xbox.Services.Leaderboard;
+using global::System.Threading.Tasks;
 
 namespace Microsoft.Xbox.Services.Stats.Manager
 {
@@ -40,7 +42,7 @@ namespace Microsoft.Xbox.Services.Stats.Manager
         /// Replaces the numerical stat by the value. Can be positive or negative
         /// </summary>
         /// <param name="user">The local user whose stats to access</param>
-        /// <param name="name">The name of the statistic to modify</param>
+        /// <param name="statName">The name of the statistic to modify</param>
         /// <param name="value">Value to replace the stat by</param>
         /// <return>Whether or not the setting was successful. Can fail if stat is not of numerical type. Will return updated stat</return>
         void SetStatAsNumber(XboxLiveUser user, string statName, double value);
@@ -49,7 +51,7 @@ namespace Microsoft.Xbox.Services.Stats.Manager
         /// Replaces the numerical stat by the value. Can be positive or negative
         /// </summary>
         /// <param name="user">The local user whose stats to access</param>
-        /// <param name="name">The name of the statistic to modify</param>
+        /// <param name="statName">The name of the statistic to modify</param>
         /// <param name="value">Value to replace the stat by</param>
         /// <return>Whether or not the setting was successful. Can fail if stat is not of numerical type. Will return updated stat</return>
         void SetStatAsInteger(XboxLiveUser user, string statName, Int64 value);
@@ -58,7 +60,7 @@ namespace Microsoft.Xbox.Services.Stats.Manager
         /// Replaces a string stat with the given value.
         /// </summary>
         /// <param name="user">The local user whose stats to access</param>
-        /// <param name="name">The name of the statistic to modify</param>
+        /// <param name="statName">The name of the statistic to modify</param>
         /// <param name="value">Value to replace the stat by</param>
         /// <return>Whether or not the setting was successful. Can fail if stat is not of string type. Will return updated stat</return>
         void SetStatAsString(XboxLiveUser user, string statName, string value);
@@ -67,7 +69,7 @@ namespace Microsoft.Xbox.Services.Stats.Manager
         /// Gets a stat value
         /// </summary>
         /// <param name="user">The local user whose stats to access</param>
-        /// <param name="name">The name of the statistic to modify</param>
+        /// <param name="statName">The name of the statistic to modify</param>
         /// <return>Whether or not the setting was successful along with updated stat</return>
         StatValue GetStat(XboxLiveUser user, string statName);
 
@@ -78,5 +80,27 @@ namespace Microsoft.Xbox.Services.Stats.Manager
         /// <param name="statNameList">The list to fill with stat names</param>
         /// <return>Whether or not the setting was successful.</return>
         List<string> GetStatNames(XboxLiveUser user);
+
+        /// <summary>
+        /// Get a leaderboard for a single leaderboard given a stat name and query parameters. 
+        /// the leaderboard result will come back in an event in the do_work loop.
+        /// </summary>
+        /// <param name="user">The local user whose stats to access</param>
+        /// <param name="statName">Stat name of the leaderboard</param>
+        /// <param name="query">An object that contains query information</param>
+        /// <remarks>
+        /// This stat needs to be configured on DevCenter for your title
+        /// </remarks>
+        void GetLeaderboard(XboxLiveUser user, string statName, LeaderboardQuery query);
+
+        /// <summary>
+        /// Get a leaderboard for a single leaderboard given a stat name for a social group and query parameters. 
+        /// the leaderboard result will come back in an event in the do_work loop.
+        /// </summary>
+        /// <param name="user">The local user whose stats to access</param>
+        /// <param name="statName">Stat name of the leaderboard</param>
+        /// <param name="socialGroup">Social Group of the leaderboard. For Example all is everybody</param>
+        /// <param name="query">An object that contains query information</param>
+        void GetSocialLeaderboard(XboxLiveUser user, string statName, string socialGroup, LeaderboardQuery query);
     }
 }

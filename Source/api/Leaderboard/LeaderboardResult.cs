@@ -46,12 +46,12 @@ namespace Microsoft.Xbox.Services.Leaderboard
         {
             get
             {
-                if (this.Request == null || string.IsNullOrEmpty(this.Request.ContinuationToken))
+                if (this.NextQuery != null)
                 {
-                    return false;
+                    return this.NextQuery.HasNext;
                 }
 
-                return true;
+                return false;
             }
         }
 
@@ -73,17 +73,7 @@ namespace Microsoft.Xbox.Services.Leaderboard
             internal set;
         }
 
-        internal LeaderboardRequest Request { get; set; }
-
-        public virtual Task<LeaderboardResult> GetNextAsync(uint maxItems)
-        {
-            if (this.Request == null || string.IsNullOrEmpty(this.Request.ContinuationToken))
-            {
-                throw new XboxException("LeaderboardResult does not have a next page.");
-            }
-            LeaderboardService service = new LeaderboardService(userContext, xboxLiveContextSettings, appConfig);
-            return service.GetLeaderboardInternal(null, appConfig.ServiceConfigurationId, this.Request.LeaderboardName, null, null, 0, null, maxItems, this.Request.ContinuationToken, this.Request.RequestType);
-        }
+        public LeaderboardQuery NextQuery { get; internal set; }
 
     }
 }

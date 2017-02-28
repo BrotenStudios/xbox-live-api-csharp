@@ -11,7 +11,7 @@ namespace Microsoft.Xbox.Services.Leaderboard
     using Social.Models;
     using System;
 
-    public interface ILeaderboardService
+    internal interface ILeaderboardService
     {
         /// <summary>
         /// Get a leaderboard for a single leaderboard given a stat name and query parameters.
@@ -26,7 +26,7 @@ namespace Microsoft.Xbox.Services.Leaderboard
         /// </remarks>
         Task<LeaderboardResult> GetLeaderboardAsync(string statName, LeaderboardQuery query);
 
-        Task<LeaderboardResult> GetSocialLeaderboardAsync(string leaderboardName, string socialGroup, LeaderboardQuery query);
+        Task<LeaderboardResult> GetSocialLeaderboardAsync(string statName, string socialGroup, LeaderboardQuery query);
 
     }
 }

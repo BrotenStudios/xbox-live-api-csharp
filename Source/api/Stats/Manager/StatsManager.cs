@@ -8,6 +8,8 @@ namespace Microsoft.Xbox.Services.Stats.Manager
     using global::System.Linq;
 
     using Microsoft.Xbox.Services.Shared;
+    using Microsoft.Xbox.Services.Leaderboard;
+    using global::System.Threading.Tasks;
 
     public class StatsManager : IStatsManager
     {
@@ -101,7 +103,7 @@ namespace Microsoft.Xbox.Services.Stats.Manager
                     }
                 }
 
-                this.AddEvent(new StatEvent(StatEventType.LocalUserAdded, user, statsValueDocTask.Exception));
+                this.AddEvent(new StatEvent(StatEventType.LocalUserAdded, user, statsValueDocTask.Exception, new StatEventArgs()));
             });
         }
 
@@ -121,12 +123,12 @@ namespace Microsoft.Xbox.Services.Stats.Manager
                         // write offline
                     }
 
-                    this.AddEvent(new StatEvent(StatEventType.LocalUserRemoved, user, continuationTask.Exception));
+                    this.AddEvent(new StatEvent(StatEventType.LocalUserRemoved, user, continuationTask.Exception, new StatEventArgs()));
                 });
             }
             else
             {
-                this.AddEvent(new StatEvent(StatEventType.LocalUserRemoved, user, null));
+                this.AddEvent(new StatEvent(StatEventType.LocalUserRemoved, user, null, new StatEventArgs()));
             }
 
             this.userStatContextMap.Remove(xboxUserId);
@@ -162,7 +164,7 @@ namespace Microsoft.Xbox.Services.Stats.Manager
             RequestFlushToService(user);
         }
 
-        public void SetStatAsInteger(XboxLiveUser user, string statName, long value)
+        public void SetStatAsInteger(XboxLiveUser user, string statName, Int64 value)
         {
             this.CheckUserValid(user);
 
@@ -248,11 +250,11 @@ namespace Microsoft.Xbox.Services.Stats.Manager
                     }
                 }
 
-                this.AddEvent(new StatEvent(StatEventType.StatUpdateComplete, statsUserContext.user, continuationTask.Exception));
+                this.AddEvent(new StatEvent(StatEventType.StatUpdateComplete, statsUserContext.user, continuationTask.Exception, new StatEventArgs()));
             });
         }
 
-        private void AddEvent(StatEvent statEvent)
+        internal void AddEvent(StatEvent statEvent)
         {
             lock (this.eventList)
             {
@@ -281,6 +283,35 @@ namespace Microsoft.Xbox.Services.Stats.Manager
                     this.FlushToService(statsUserContext);
                 }
             }
+        }
+
+        public void GetLeaderboard(XboxLiveUser user, string statName, LeaderboardQuery query)
+        {
+            this.CheckUserValid(user);
+            this.userStatContextMap[user.XboxUserId].xboxLiveContext.LeaderboardService.GetLeaderboardAsync(statName, query).ContinueWith(responseTask =>
+            {
+                ((StatsManager)Singleton).AddEvent(
+                    new StatEvent(StatEventType.GetLeaderboardComplete, 
+                    user, 
+                    responseTask.Exception, 
+                    new LeaderboardResultEventArgs(responseTask.Result)
+                    ));
+            });
+        }
+
+        public void GetSocialLeaderboard(XboxLiveUser user, string statName, string socialGroup, LeaderboardQuery query)
+        {
+            this.CheckUserValid(user);
+            this.userStatContextMap[user.XboxUserId].xboxLiveContext.LeaderboardService.GetSocialLeaderboardAsync(statName, socialGroup, query).ContinueWith(responseTask =>
+            {
+                ((StatsManager)Singleton).AddEvent(
+                    new StatEvent(StatEventType.GetLeaderboardComplete,
+                    user,
+                    responseTask.Exception,
+                    new LeaderboardResultEventArgs(responseTask.Result)
+                    ));
+            });
+
         }
     }
 }

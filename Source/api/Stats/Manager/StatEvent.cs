@@ -13,20 +13,23 @@ namespace Microsoft.Xbox.Services.Stats.Manager
     {
         LocalUserAdded,
         LocalUserRemoved,
-        StatUpdateComplete
+        StatUpdateComplete,
+        GetLeaderboardComplete,
     }
 
     public class StatEvent
     {
         public StatEventType EventType { get; private set; }
+        public StatEventArgs EventArgs { get; private set; }
         public XboxLiveUser LocalUser { get; private set; }
         public Exception ErrorInfo { get; private set; }
 
-        public StatEvent(StatEventType eventType, XboxLiveUser user, Exception errorInfo)
+        public StatEvent(StatEventType eventType, XboxLiveUser user, Exception errorInfo, StatEventArgs args)
         {
             EventType = eventType;
             LocalUser = user;
             ErrorInfo = errorInfo;
+            EventArgs = args;
         }
     }
 }
