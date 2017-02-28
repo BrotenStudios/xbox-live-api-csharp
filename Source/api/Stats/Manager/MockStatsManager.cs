@@ -100,7 +100,15 @@ namespace Microsoft.Xbox.Services.Stats.Manager
             {
                 throw new ArgumentException("Local User needs to be added.");
             }
-            mockLBService.GetLeaderboardAsync(statName, query);
+            mockLBService.GetLeaderboardAsync(statName, query).ContinueWith(responseTask =>
+            {
+                this.statEventList.Add(
+                    new StatEvent(StatEventType.GetLeaderboardComplete,
+                    user,
+                    responseTask.Exception,
+                    new LeaderboardResultEventArgs(responseTask.Result)
+                    ));
+            }); ;
         }
 
         public void GetSocialLeaderboard(XboxLiveUser user, string statName, string socialGroup, LeaderboardQuery query)
@@ -109,7 +117,15 @@ namespace Microsoft.Xbox.Services.Stats.Manager
             {
                 throw new ArgumentException("Local User needs to be added.");
             }
-            mockLBService.GetSocialLeaderboardAsync(statName, socialGroup, query);
+            mockLBService.GetSocialLeaderboardAsync(statName, socialGroup, query).ContinueWith(responseTask =>
+            {
+                this.statEventList.Add(
+                    new StatEvent(StatEventType.GetLeaderboardComplete,
+                    user,
+                    responseTask.Exception,
+                    new LeaderboardResultEventArgs(responseTask.Result)
+                    ));
+            }); ;
 
         }
     }
